@@ -1,7 +1,6 @@
 const db = require("../models");
 const SearchSession = db.search_sessions;
 const Proposal = db.proposals;
-// const Op = db.Sequelize.Op;
 
 exports.create = (req, res) => {
   const search_session = {
@@ -14,10 +13,16 @@ exports.create = (req, res) => {
       res.status(201).send(data);
     })
     .catch(err => {
-      res.status(500).send({
-        message:
-          err.message || "Some error occurred while creating the Search Session."
-      });
+      if(err.name === 'SequelizeDatabaseError') {
+        res.status(422).send({
+          message: err.message
+        });
+      } else {
+        res.status(500).send({
+          message:
+            err.message || "Some error occurred while creating the Search Session."
+        });
+      }
     });
 };
 
@@ -56,17 +61,25 @@ exports.update = (req, res) => {
     return;
   }
 
-  SearchSession.update(req.body, {
-    where: { uuid: uuid }
-  })
-    .then(num => {
-      if (num == 1) {
-        res.send({
-          message: "Search Session was updated successfully."
-        });
-      } else { // improve error handling here !
-        res.send({
-          message: `Cannot update Search Session with uuiid=${uuid}. Maybe Search Session was not found or req.body is empty!`
+  SearchSession.findByPk(uuid)
+    .then(searchSession => {
+      if (searchSession) {
+        searchSession.update(req.body)
+          .then(searchSession => {
+            res.send(searchSession);
+          })
+          .catch(err => {
+            if(err.name === 'SequelizeDatabaseError') {
+              res.status(422).send({
+                message: err.message
+              });
+            } else {
+              throw(err)
+            }
+          });
+      } else {
+        res.status(404).send({
+          message: `Cannot find Search Session with uuid=${uuid}.`
         });
       }
     })

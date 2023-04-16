@@ -9,9 +9,7 @@ describe("#create ", () => {
       return request(app)
         .post("/search_sessions")
         .send({})
-        .then(response => {
-          expect(response.statusCode).toBe(201);
-        });
+        .expect(201)
     });
 
     test("returns new search session", () => {
@@ -27,13 +25,11 @@ describe("#create ", () => {
   describe("when creation fails", () => {
     const invalidPublic = 'invalid-public-value';
 
-    test("returns a 201 status code", () => {
+    test("returns a 500 status code", () => {
       return request(app)
         .post("/search_sessions")
         .send({ public: invalidPublic})
-        .then(response => {
-          expect(response.statusCode).toBe(500);
-        });
+        .expect(422)
     });
 
     test("returns an error message", () => {
@@ -56,9 +52,7 @@ describe("#findOne ", () => {
       return request(app)
         .get(`/search_sessions/${uuid}`)
         .send({})
-        .then(response => {
-          expect(response.statusCode).toBe(400);
-        });
+        .expect(400)
     });
 
     test("returns an error message", () => {
@@ -78,9 +72,7 @@ describe("#findOne ", () => {
       return request(app)
         .get(`/search_sessions/${uuid}`)
         .send({})
-        .then(response => {
-          expect(response.statusCode).toBe(404);
-        });
+        .expect(404)
     });
 
     test("returns an error message", () => {
@@ -101,9 +93,7 @@ describe("#findOne ", () => {
       return request(app)
         .get(`/search_sessions/${uuid}`)
         .send({})
-        .then(response => {
-          expect(response.statusCode).toBe(200);
-        });
+        .expect(200)
     });
 
     test("returns search session details", async () => {
@@ -116,6 +106,101 @@ describe("#findOne ", () => {
         .then(response => {
           expect(response.body).toHaveProperty('createdAt');
         });
+    });
+  });
+});
+
+describe("#update ", () => {
+  describe("when an invalid uuid is given ", () => {
+    const uuid = 'invalid-uuid-format';
+
+    test("returns a 400 status code", () => {
+      return request(app)
+        .put(`/search_sessions/${uuid}`)
+        .send({})
+        .expect(400)
+    });
+
+    test("returns an error message", () => {
+      return request(app)
+        .put(`/search_sessions/${uuid}`)
+        .send({})
+        .then(response => {
+          expect(response.body.message).toEqual('Invalid UUID syntax')
+        });
+    });
+  });
+
+  describe("when an unknown uuid is given ", () => {
+    const uuid = '00000000-0000-0000-0000-000000000000';
+
+    test("returns a 404 status code", () => {
+      return request(app)
+        .put(`/search_sessions/${uuid}`)
+        .send({})
+        .expect(404)
+    });
+
+    test("returns an error message", () => {
+      return request(app)
+        .put(`/search_sessions/${uuid}`)
+        .send({})
+        .then(response => {
+          expect(response.body.message).not.toBeNull()
+        });
+    });
+  });
+
+  describe("when a correct uuid is given ", () => {
+    describe("with valid parameters", () => {
+      test("returns a 200 status code", async () => {
+        let searchSession = await SearchSession.create({ public: 'kids' });
+        const uuid = searchSession.uuid;
+
+        return request(app)
+          .put(`/search_sessions/${uuid}`)
+          .send({ public: 'friends' })
+          .expect(200)
+      });
+
+      test("updates search session details", async () => {
+        let searchSession = await SearchSession.create({ public: 'kids' });
+        const uuid = searchSession.uuid;
+
+        expect(searchSession.public).toEqual('kids');
+
+        return request(app)
+          .put(`/search_sessions/${uuid}`)
+          .send({ public: 'friends' })
+          .then(response => {
+            expect(response.body['public']).toEqual('friends');
+          });
+      });
+    });
+    describe("with invalid parameters", () => {
+      test("returns a 422 status code", async () => {
+        let searchSession = await SearchSession.create({ public: 'kids' });
+        const uuid = searchSession.uuid;
+
+        return request(app)
+          .put(`/search_sessions/${uuid}`)
+          .send({ public: 'not-a-valid-public' })
+          .expect(422)
+      });
+
+      test("returns an error message", async () => {
+        let searchSession = await SearchSession.create({ public: 'kids' });
+        const uuid = searchSession.uuid;
+
+        expect(searchSession.public).toEqual('kids');
+
+        return request(app)
+          .put(`/search_sessions/${uuid}`)
+          .send({ public: 'not-a-valid-public' })
+          .then(response => {
+            expect(response.body.message).not.toBeNull()
+          });
+      });
     });
   });
 });

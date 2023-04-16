@@ -5,9 +5,7 @@ describe("#ping ", () => {
   test("returns a 200 status code", () => {
     return request(app)
       .get("/")
-      .then(response => {
-        expect(response.statusCode).toBe(200);
-      });
+      .expect(200)
   });
 
   test("returns JSON", () => {
