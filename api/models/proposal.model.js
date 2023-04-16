@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-  const Proposal = sequelize.define("proposal", {
+  const Proposal = sequelize.define('proposal', {
     uuid: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     tconst: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: false
     },
     accepted: {
       type: DataTypes.BOOLEAN
@@ -22,12 +22,12 @@ module.exports = (sequelize, DataTypes) => {
     },
     already_seen_feedback: {
       type: DataTypes.ENUM('liked', 'disliked', 'do_no_remember')
-    },
+    }
   }, {
     tableName: 'proposals',
     timestamps: true,
     underscored: true
-  });
+  })
 
-  return Proposal;
-};
+  return Proposal
+}

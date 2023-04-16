@@ -1,11 +1,11 @@
-var express = require('express');
-var router = express.Router();
-const titles = require("../controllers/titles.controller.js");
+const express = require('express')
+const router = express.Router()
+const titles = require('../controllers/titles.controller.js')
 
 // GET titles listing
-router.get('/', titles.search);
+router.get('/', titles.search)
 
 // Retrieve a title
-router.get('/:tconst', titles.findOne);
+router.get('/:tconst', titles.findOne)
 
-module.exports = router;
+module.exports = router

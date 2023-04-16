@@ -1,2 +1,2 @@
-const db = require("../models");
+const db = require('../models')
 afterAll(() => db.sequelize.close())

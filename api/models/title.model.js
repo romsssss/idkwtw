@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-  const Title = sequelize.define("title", {
+  const Title = sequelize.define('title', {
     tconst: {
       type: DataTypes.STRING,
       primaryKey: true
@@ -39,14 +39,15 @@ module.exports = (sequelize, DataTypes) => {
     },
     writers: {
       type: DataTypes.ARRAY(DataTypes.STRING)
-    },
+    }
   }, {
     tableName: 'titles',
     timestamps: false,
     underscored: true
-  });
+  })
 
-  Title.sync = () => Promise.resolve();
+  // Skip migration for this model
+  Title.sync = () => Promise.resolve()
 
-  return Title;
-};
+  return Title
+}

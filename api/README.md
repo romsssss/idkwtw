@@ -32,3 +32,11 @@ DEBUG=webservice:* NODE_ENV=development npm start
 ````bash
 npm test
 ````
+
+## Lint project
+
+With ESLint:
+
+````bash
+npm run lint
+````

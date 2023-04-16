@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-  const SearchSession = sequelize.define("search_session", {
+  const SearchSession = sequelize.define('search_session', {
     uuid: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
@@ -15,12 +15,12 @@ module.exports = (sequelize, DataTypes) => {
     },
     tconst_chosen: {
       type: DataTypes.STRING
-    },
+    }
   }, {
     tableName: 'search_sessions',
     timestamps: true,
     underscored: true
-  });
+  })
 
-  return SearchSession;
-};
+  return SearchSession
+}
