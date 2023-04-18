@@ -1,3 +1,4 @@
+const helper = require('../utils/helper.util')
 const db = require('../models')
 const SearchSession = db.search_sessions
 const Proposal = db.proposals
@@ -28,9 +29,8 @@ exports.create = (req, res) => {
 
 exports.findOne = (req, res) => {
   const uuid = req.params.uuid
-  const uuidRegexExp = /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/gi
 
-  if (!uuidRegexExp.test(uuid)) {
+  if (!helper.isValidUUID(uuid)) {
     res.status(400).send({ message: 'Invalid UUID syntax' })
     return
   }
@@ -54,9 +54,8 @@ exports.findOne = (req, res) => {
 
 exports.update = (req, res) => {
   const uuid = req.params.uuid
-  const uuidRegexExp = /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/gi
 
-  if (!uuidRegexExp.test(uuid)) {
+  if (!helper.isValidUUID(uuid)) {
     res.status(400).send({ message: 'Invalid UUID syntax' })
     return
   }

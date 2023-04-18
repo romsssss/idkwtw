@@ -1,3 +1,4 @@
+const helper = require('../utils/helper.util')
 const db = require('../models')
 const SearchSession = db.search_sessions
 const Proposal = db.proposals
@@ -6,12 +7,11 @@ const Proposal = db.proposals
 
 exports.create = async (req, res) => {
   const searchSessionUUID = req.query.search_session_uuid
-  const uuidRegexExp = /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/gi
 
   if (!searchSessionUUID) {
     res.status(400).send({ message: 'Missing search_session_uuid param' })
     return
-  } else if (!uuidRegexExp.test(searchSessionUUID)) {
+  } else if (!helper.isValidUUID(searchSessionUUID)) {
     res.status(400).send({ message: 'Invalid Search Session UUID syntax' })
     return
   }
@@ -63,12 +63,11 @@ exports.findOne = (req, res) => {
 
 exports.findAll = async (req, res) => {
   const searchSessionUUID = req.query.search_session_uuid
-  const uuidRegexExp = /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/gi
 
   if (!searchSessionUUID) {
     res.status(400).send({ message: 'Missing search_session_uuid param' })
     return
-  } else if (!uuidRegexExp.test(searchSessionUUID)) {
+  } else if (!helper.isValidUUID(searchSessionUUID)) {
     res.status(400).send({ message: 'Invalid Search Session UUID syntax' })
     return
   }
@@ -94,9 +93,8 @@ exports.findAll = async (req, res) => {
 
 exports.update = (req, res) => {
   const uuid = req.params.uuid
-  const uuidRegexExp = /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/gi
 
-  if (!uuidRegexExp.test(uuid)) {
+  if (!helper.isValidUUID(uuid)) {
     res.status(400).send({ message: 'Invalid UUID syntax' })
     return
   }
