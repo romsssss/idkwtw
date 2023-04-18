@@ -7,10 +7,10 @@ const logger = require('morgan')
 require('dotenv').config({ path: `.env.${process.env.NODE_ENV}` })
 require('dotenv').config()
 
-const indexRouter = require('./routes/index')
-const proposalsRouter = require('./routes/proposals')
-const SearchSessionsRouter = require('./routes/search_sessions')
-const titlesRouter = require('./routes/titles')
+const indexRouter = require('./src/routes/index')
+const proposalsRouter = require('./src/routes/proposals')
+const SearchSessionsRouter = require('./src/routes/search_sessions')
+const titlesRouter = require('./src/routes/titles')
 
 const app = express()
 
