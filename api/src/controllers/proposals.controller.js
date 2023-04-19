@@ -31,7 +31,7 @@ exports.create = async (req, res) => {
 
   Proposal.create(proposal, { include: SearchSession })
     .then(data => {
-      res.send(data)
+      res.status(201).send(data)
     })
     .catch(err => {
       res.status(500).send({
@@ -43,6 +43,11 @@ exports.create = async (req, res) => {
 
 exports.findOne = (req, res) => {
   const uuid = req.params.uuid
+
+  if (!helper.isValidUUID(uuid)) {
+    res.status(400).send({ message: 'Invalid UUID syntax' })
+    return
+  }
 
   Proposal.findByPk(uuid)
     .then(proposal => {
@@ -99,17 +104,25 @@ exports.update = (req, res) => {
     return
   }
 
-  Proposal.update(req.body, {
-    where: { uuid }
-  })
-    .then(num => {
-      if (num === 1) {
-        res.send({
-          message: 'Proposal was updated successfully.'
-        })
-      } else { // improve error handling here !
-        res.send({
-          message: `Cannot update Proposal with uuiid=${uuid}. Maybe Proposal was not found or req.body is empty!`
+  Proposal.findByPk(uuid)
+    .then(proposal => {
+      if (proposal) {
+        proposal.update(req.body)
+          .then(proposal => {
+            res.send(proposal)
+          })
+          .catch(err => {
+            if (err.name === 'SequelizeDatabaseError') {
+              res.status(422).send({
+                message: err.message
+              })
+            } else {
+              throw (err)
+            }
+          })
+      } else {
+        res.status(404).send({
+          message: `Cannot find Proposal with uuid=${uuid}.`
         })
       }
     })

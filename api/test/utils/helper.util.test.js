@@ -1,4 +1,3 @@
-
 const helper = require('../../src/utils/helper.util')
 
 describe('Helper Utils', () => {
