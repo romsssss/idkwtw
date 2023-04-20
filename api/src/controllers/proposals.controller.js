@@ -2,8 +2,7 @@ const helper = require('../utils/helper.util')
 const db = require('../models')
 const SearchSession = db.search_sessions
 const Proposal = db.proposals
-// const Title = db.titles
-// const Op = db.Sequelize.Op
+const ProposalCreatorService = require('../services/proposal_creator.service')
 
 exports.create = async (req, res) => {
   const searchSessionUUID = req.query.search_session_uuid
@@ -24,21 +23,14 @@ exports.create = async (req, res) => {
     return
   }
 
-  const proposal = {
-    tconst: 'tt13683364',
-    search_session_uuid: searchSession.uuid
-  }
+  const ProposalCreatorServiceInstance = new ProposalCreatorService(searchSession.uuid)
+  const serviceRes = await ProposalCreatorServiceInstance.perform()
 
-  Proposal.create(proposal, { include: SearchSession })
-    .then(data => {
-      res.status(201).send(data)
-    })
-    .catch(err => {
-      res.status(500).send({
-        message:
-          err.message || 'Some error occurred while creating the Proposal.'
-      })
-    })
+  if (serviceRes.success) {
+    res.status(201).send(serviceRes.body)
+  } else {
+    res.status(500).send({ message: serviceRes.error })
+  }
 }
 
 exports.findOne = (req, res) => {
