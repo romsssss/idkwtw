@@ -85,10 +85,15 @@ describe('#findOne', () => {
   })
 
   describe('when a correct uuid is given ', () => {
-    test('returns a 200 status code', async () => {
-      const searchSession = await SearchSession.create()
-      const uuid = searchSession.uuid
+    let searchSession
+    let uuid
 
+    beforeEach(async () => {
+      searchSession = await SearchSession.create()
+      uuid = searchSession.uuid
+    })
+
+    test('returns a 200 status code', async () => {
       return request(app)
         .get(`/search_sessions/${uuid}`)
         .send({})
@@ -96,9 +101,6 @@ describe('#findOne', () => {
     })
 
     test('returns search session details', async () => {
-      const searchSession = await SearchSession.create()
-      const uuid = searchSession.uuid
-
       return request(app)
         .get(`/search_sessions/${uuid}`)
         .send({})
@@ -151,11 +153,16 @@ describe('#update ', () => {
   })
 
   describe('when a correct uuid is given ', () => {
+    let searchSession
+    let uuid
+
+    beforeEach(async () => {
+      searchSession = await SearchSession.create({ public: 'kids' })
+      uuid = searchSession.uuid
+    })
+
     describe('with valid parameters', () => {
       test('returns a 200 status code', async () => {
-        const searchSession = await SearchSession.create({ public: 'kids' })
-        const uuid = searchSession.uuid
-
         return request(app)
           .put(`/search_sessions/${uuid}`)
           .send({ public: 'friends' })
@@ -163,9 +170,6 @@ describe('#update ', () => {
       })
 
       test('updates search session details', async () => {
-        const searchSession = await SearchSession.create({ public: 'kids' })
-        const uuid = searchSession.uuid
-
         expect(searchSession.public).toEqual('kids')
 
         return request(app)
@@ -179,9 +183,6 @@ describe('#update ', () => {
 
     describe('with invalid parameters', () => {
       test('returns a 422 status code', async () => {
-        const searchSession = await SearchSession.create({ public: 'kids' })
-        const uuid = searchSession.uuid
-
         return request(app)
           .put(`/search_sessions/${uuid}`)
           .send({ public: 'not-a-valid-public' })
@@ -189,9 +190,6 @@ describe('#update ', () => {
       })
 
       test('returns an error message', async () => {
-        const searchSession = await SearchSession.create({ public: 'kids' })
-        const uuid = searchSession.uuid
-
         expect(searchSession.public).toEqual('kids')
 
         return request(app)

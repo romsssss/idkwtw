@@ -68,8 +68,13 @@ describe('#create', () => {
   })
 
   describe('when creation is successful', () => {
+    let searchSession
+
+    beforeEach(async () => {
+      searchSession = await SearchSession.create()
+    })
+
     test('returns a 201 status code', async () => {
-      const searchSession = await SearchSession.create()
       return request(app)
         .post('/proposals')
         .query({ search_session_uuid: searchSession.uuid })
@@ -78,8 +83,6 @@ describe('#create', () => {
     })
 
     test('returns new search session', async () => {
-      const searchSession = await SearchSession.create()
-
       return request(app)
         .post('/proposals')
         .query({ search_session_uuid: searchSession.uuid })
@@ -129,21 +132,21 @@ describe('#findOne', () => {
   })
 
   describe('when a correct uuid is given ', () => {
-    test('returns a 200 status code', async () => {
+    let uuid
+
+    beforeEach(async () => {
       const searchSession = await SearchSession.create()
       const proposal = await Proposal.create({ search_session_uuid: searchSession.uuid, tconst: 'tt00000000' })
-      const uuid = proposal.uuid
+      uuid = proposal.uuid
+    })
 
+    test('returns a 200 status code', async () => {
       return request(app)
         .get(`/proposals/${uuid}`)
         .expect(200)
     })
 
     test('returns search session details', async () => {
-      const searchSession = await SearchSession.create()
-      const proposal = await Proposal.create({ search_session_uuid: searchSession.uuid, tconst: 'tt00000000' })
-      const uuid = proposal.uuid
-
       return request(app)
         .get(`/proposals/${uuid}`)
         .then(response => {
@@ -279,12 +282,17 @@ describe('#update ', () => {
   })
 
   describe('when a correct uuid is given ', () => {
+    let proposal
+    let uuid
+
+    beforeEach(async () => {
+      const searchSession = await SearchSession.create()
+      proposal = await Proposal.create({ search_session_uuid: searchSession.uuid, tconst: 'tt00000000' })
+      uuid = proposal.uuid
+    })
+
     describe('with valid parameters', () => {
       test('returns a 200 status code', async () => {
-        const searchSession = await SearchSession.create()
-        const proposal = await Proposal.create({ search_session_uuid: searchSession.uuid, tconst: 'tt00000000' })
-        const uuid = proposal.uuid
-
         return request(app)
           .put(`/proposals/${uuid}`)
           .send({ rejected_feedback: 'too_long' })
@@ -292,10 +300,6 @@ describe('#update ', () => {
       })
 
       test('updates proposal details', async () => {
-        const searchSession = await SearchSession.create()
-        const proposal = await Proposal.create({ search_session_uuid: searchSession.uuid, tconst: 'tt00000000' })
-        const uuid = proposal.uuid
-
         expect(proposal.rejected_feedback).toBeNull()
 
         return request(app)
@@ -309,10 +313,6 @@ describe('#update ', () => {
 
     describe('with invalid parameters', () => {
       test('returns a 422 status code', async () => {
-        const searchSession = await SearchSession.create()
-        const proposal = await Proposal.create({ search_session_uuid: searchSession.uuid, tconst: 'tt00000000' })
-        const uuid = proposal.uuid
-
         return request(app)
           .put(`/proposals/${uuid}`)
           .send({ rejected_feedback: 'invalid-value' })
@@ -320,10 +320,6 @@ describe('#update ', () => {
       })
 
       test('returns an error message', async () => {
-        const searchSession = await SearchSession.create()
-        const proposal = await Proposal.create({ search_session_uuid: searchSession.uuid, tconst: 'tt00000000' })
-        const uuid = proposal.uuid
-
         return request(app)
           .put(`/proposals/${uuid}`)
           .send({ rejected_feedback: 'invalid-value' })
