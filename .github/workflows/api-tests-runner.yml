@@ -48,9 +48,10 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Prepate Database
-        run: psql -d postgres -U postgres -c 'SELECT 1;'
+        run: psql -f data/schema.sql postgresql://postgres:postgres@localhost:5432/postgres
+        # run: psql -d postgres -U postgres -c 'SELECT 1;'
+        # run: PGPASSWORD=postgres psql -U postgres -d postgres -p 5432 < data/schema.sql
         env:
           PGPASSWORD: postgres
-        # run: PGPASSWORD=postgres psql -U postgres -d postgres -p 5432 < data/schema.sql
       - name: Run tests
         run: npm test
