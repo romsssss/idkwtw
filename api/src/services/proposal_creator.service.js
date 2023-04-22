@@ -1,7 +1,7 @@
 const db = require('../models')
 const Proposal = db.proposals
 const SearchSession = db.search_sessions
-// const Title = db.titles
+const Title = db.titles
 
 class ProposalCreatorService {
   constructor (searchSessionUUID) {
@@ -14,8 +14,10 @@ class ProposalCreatorService {
 
       if (!searchSession) { throw new Error('Search Session not found') }
 
+      const title = await Title.findOne({ order: db.sequelize.random() })
+
       const proposalParams = {
-        tconst: 'tt13683364',
+        tconst: title.tconst,
         search_session_uuid: searchSession.uuid
       }
       const proposal = await Proposal.create(proposalParams, { include: SearchSession })

@@ -1,7 +1,9 @@
 const ProposalCreatorService = require('../../src/services/proposal_creator.service')
+const crypto = require('crypto')
 const db = require('../../src/models')
 const SearchSession = db.search_sessions
 const Proposal = db.proposals
+const Title = db.titles
 
 describe('#perform', () => {
   describe('when search session does not exist', () => {
@@ -27,6 +29,7 @@ describe('#perform', () => {
 
     beforeEach(async () => {
       searchSession = await SearchSession.create()
+      await Title.create({ tconst: `tt${crypto.randomBytes(4).toString('hex')}` })
     })
 
     test('returns success true', async () => {
