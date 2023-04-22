@@ -47,6 +47,6 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Prepate Database
-        run: psql -U postrgres -d postgres < data/schema.sql
+        run: PGPASSWORD=postgres psql -U postgres -d postgres < data/schema.sql
       - name: Run tests
         run: npm test
