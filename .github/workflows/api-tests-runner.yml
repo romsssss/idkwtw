@@ -49,4 +49,4 @@ jobs:
       - name: Prepate Database
         run: psql -U postrgres -d postgres < data/schema.sql
       - name: Run tests
-        run: npm run lint
+        run: npm test
