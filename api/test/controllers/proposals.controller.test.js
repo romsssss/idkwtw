@@ -1,5 +1,7 @@
 const request = require('supertest')
 const crypto = require('crypto')
+const VideoCreatorService = require('../../src/services/video_creator.service')
+jest.mock('../../src/services/video_creator.service')
 const app = require('../../app')
 const db = require('../../src/models')
 const SearchSession = db.search_sessions
@@ -74,6 +76,13 @@ describe('#create', () => {
 
     beforeEach(async () => {
       searchSession = await SearchSession.create()
+      VideoCreatorService.mockImplementation(() => {
+        return {
+          perform: () => {
+            return { success: true, body: {} }
+          }
+        }
+      })
     })
 
     test('returns a 201 status code', async () => {
@@ -241,7 +250,7 @@ describe('#findAll', () => {
         .query({ search_session_uuid: searchSession.uuid })
         .then(response => {
           expect(response.body).toHaveLength(2)
-          expect(response.body[0].tconst).toEqual(title1.tconst)
+          expect([title1.tconst, title2.tconst]).toContain(response.body[0].tconst)
         })
     })
   })

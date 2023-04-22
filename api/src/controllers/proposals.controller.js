@@ -25,13 +25,13 @@ exports.create = async (req, res) => {
     return
   }
 
-  const ProposalCreatorServiceInstance = new ProposalCreatorService(searchSession.uuid)
-  const serviceRes = await ProposalCreatorServiceInstance.perform()
+  const proposalCreatorServiceInstance = new ProposalCreatorService(searchSession.uuid)
+  const serviceRes = await proposalCreatorServiceInstance.perform()
 
   if (serviceRes.success) {
     res.status(201).send(serviceRes.body)
   } else {
-    res.status(500).send({ message: serviceRes.error })
+    res.status(500).send({ message: serviceRes.error.message })
   }
 }
 

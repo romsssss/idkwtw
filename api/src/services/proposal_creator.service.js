@@ -1,7 +1,9 @@
+const VideoCreatorService = require('../../src/services/video_creator.service')
 const db = require('../models')
 const Proposal = db.proposals
 const SearchSession = db.search_sessions
 const Title = db.titles
+const Video = db.videos
 
 class ProposalCreatorService {
   constructor (searchSessionUUID) {
@@ -14,7 +16,12 @@ class ProposalCreatorService {
 
       if (!searchSession) { throw new Error('Search Session not found') }
 
-      const title = await Title.findOne({ order: db.sequelize.random() })
+      const title = await this._pickTitle()
+      if (!title.video) {
+        const videoCreatorServiceInstance = new VideoCreatorService(title.tconst)
+        const serviceRes = await videoCreatorServiceInstance.perform()
+        if (!serviceRes.success) { throw serviceRes.error }
+      }
 
       const proposalParams = {
         tconst: title.tconst,
@@ -28,15 +35,9 @@ class ProposalCreatorService {
     }
   }
 
-  async #searchSession () {
-    return await SearchSession.findByPk(this.searchSessionUUID)
-  }
-
-  async #proposalParams () {
-    return {
-      tconst: 'tt13683364',
-      search_session_uuid: await this.#searchSession().uuid
-    }
+  async _pickTitle () {
+    return await Title.findOne({ order: db.sequelize.random(), include: Video })
+    // return await Title.findByPk('tt0137523', { include: Video })
   }
 }
 

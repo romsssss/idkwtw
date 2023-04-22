@@ -1,5 +1,7 @@
 const ProposalCreatorService = require('../../src/services/proposal_creator.service')
 const crypto = require('crypto')
+const VideoCreatorService = require('../../src/services/video_creator.service')
+jest.mock('../../src/services/video_creator.service')
 const db = require('../../src/models')
 const SearchSession = db.search_sessions
 const Proposal = db.proposals
@@ -10,15 +12,15 @@ describe('#perform', () => {
     const unknownSearchSessionUUID = '00000000-0000-0000-0000-000000000000'
 
     test('returns success false', async () => {
-      const ProposalCreatorServiceInstance = new ProposalCreatorService(unknownSearchSessionUUID)
-      const res = await ProposalCreatorServiceInstance.perform()
+      const proposalCreatorServiceInstance = new ProposalCreatorService(unknownSearchSessionUUID)
+      const res = await proposalCreatorServiceInstance.perform()
 
       expect(res.success).toBe(false)
     })
 
     test('returns an error message', async () => {
-      const ProposalCreatorServiceInstance = new ProposalCreatorService(unknownSearchSessionUUID)
-      const res = await ProposalCreatorServiceInstance.perform()
+      const proposalCreatorServiceInstance = new ProposalCreatorService(unknownSearchSessionUUID)
+      const res = await proposalCreatorServiceInstance.perform()
 
       expect(res.error.message).toEqual('Search Session not found')
     })
@@ -32,19 +34,57 @@ describe('#perform', () => {
       await Title.create({ tconst: `tt${crypto.randomBytes(4).toString('hex')}` })
     })
 
-    test('returns success true', async () => {
-      const ProposalCreatorServiceInstance = new ProposalCreatorService(searchSession.uuid)
-      const res = await ProposalCreatorServiceInstance.perform()
+    describe('when everythig goes fine', () => {
+      beforeEach(async () => {
+        VideoCreatorService.mockImplementation(() => {
+          return {
+            perform: () => {
+              return { success: true, body: {} }
+            }
+          }
+        })
+      })
 
-      expect(res.success).toBe(true)
+      test('returns success true', async () => {
+        const proposalCreatorServiceInstance = new ProposalCreatorService(searchSession.uuid)
+        const res = await proposalCreatorServiceInstance.perform()
+
+        expect(res.success).toBe(true)
+      })
+
+      test('returns a new proposal instance', async () => {
+        const proposalCreatorServiceInstance = new ProposalCreatorService(searchSession.uuid)
+        const res = await proposalCreatorServiceInstance.perform()
+
+        expect(res.body).toBeInstanceOf(Proposal)
+        expect(res.body.search_session_uuid).not.toBeNull()
+      })
     })
 
-    test('returns a new proposal instance', async () => {
-      const ProposalCreatorServiceInstance = new ProposalCreatorService(searchSession.uuid)
-      const res = await ProposalCreatorServiceInstance.perform()
+    describe('when trailer video cannot be retrieved', () => {
+      beforeEach(() => {
+        VideoCreatorService.mockImplementation(() => {
+          return {
+            perform: () => {
+              return { success: false, error: new Error('Oops') }
+            }
+          }
+        })
+      })
 
-      expect(res.body).toBeInstanceOf(Proposal)
-      expect(res.body.search_session_uuid).not.toBeNull()
+      test('returns success false', async () => {
+        const proposalCreatorServiceInstance = new ProposalCreatorService(searchSession.uuid)
+        const res = await proposalCreatorServiceInstance.perform()
+
+        expect(res.success).toBe(false)
+      })
+
+      test('returns an error', async () => {
+        const proposalCreatorServiceInstance = new ProposalCreatorService(searchSession.uuid)
+        const res = await proposalCreatorServiceInstance.perform()
+
+        expect(res.error.message).toEqual('Oops')
+      })
     })
   })
 })

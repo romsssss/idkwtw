@@ -36,7 +36,7 @@ db.videos.belongsTo(db.titles, {
   foreignKey: 'tconst'
 })
 
-db.titles.hasMany(db.videos, {
+db.titles.hasOne(db.videos, {
   foreignKey: 'tconst'
 })
 
