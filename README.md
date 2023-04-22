@@ -2,7 +2,6 @@
 
 _I Don't Know What To Watch_, is a minimalist movie recommendation system.
 
-
 ## Getting started
 
 This projects runs thanks to three services

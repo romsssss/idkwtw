@@ -1,22 +1,19 @@
-CREATE MATERIALIZED VIEW IF NOT EXISTS public.titles
-AS
-  SELECT
-    title_basics.*,
-    title_ratings.average_rating,
-    title_ratings.num_votes,
-    title_crew.directors,
-    title_crew.writers
-  FROM
-    imdb_datasets.title_basics
-    LEFT JOIN imdb_datasets.title_ratings ON title_ratings.tconst = title_basics.tconst
-    LEFT JOIN imdb_datasets.title_crew ON title_crew.tconst = title_basics.tconst
-  WHERE
-    title_type = 'movie'
-    AND NOT ('Adult' = ANY (genres))
-    AND average_rating > 6
-  ORDER BY
-    tconst
-;
+CREATE TABLE IF NOT EXISTS public.titles (
+  tconst VARCHAR(10) UNIQUE NOT NULL PRIMARY KEY,
+  title_type VARCHAR(255),
+  primary_title TEXT,
+  original_title TEXT,
+  is_adult BOOLEAN,
+  start_year SMALLINT,
+  end_year SMALLINT,
+  runtime_minutes INTEGER,
+  genres VARCHAR(255)[],
+  created_on TIMESTAMP,
+  average_rating FLOAT,
+  num_votes INTEGER,
+  directors VARCHAR(10)[],
+  writers VARCHAR(10)[]
+);
 
 DROP TYPE IF EXISTS public.enum_search_sessions_public CASCADE;
 CREATE TYPE public.enum_search_sessions_public AS ENUM ('alone', 'date', 'partner', 'kids', 'friends', 'family');
@@ -45,6 +42,6 @@ CREATE TABLE IF NOT EXISTS public.proposals (
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL,
     PRIMARY KEY (uuid),
-    CONSTRAINT proposal_search_session_uuid_fkey FOREIGN KEY(search_session_uuid) REFERENCES public.search_sessions(uuid)
-    -- CONSTRAINT proposal_search_session_tconst_fkey FOREIGN KEY(tconst) REFERENCES public.titles(tconst)
+    CONSTRAINT proposal_search_session_uuid_fkey FOREIGN KEY(search_session_uuid) REFERENCES public.search_sessions(uuid),
+    CONSTRAINT proposal_search_session_tconst_fkey FOREIGN KEY(tconst) REFERENCES public.titles(tconst)
 );

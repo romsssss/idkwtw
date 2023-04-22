@@ -1,7 +1,9 @@
 const request = require('supertest')
+const crypto = require('crypto')
 const app = require('../../app')
 const db = require('../../src/models')
 const SearchSession = db.search_sessions
+const Title = db.titles
 const Proposal = db.proposals
 
 describe('#create', () => {
@@ -136,7 +138,8 @@ describe('#findOne', () => {
 
     beforeEach(async () => {
       const searchSession = await SearchSession.create()
-      const proposal = await Proposal.create({ search_session_uuid: searchSession.uuid, tconst: 'tt00000000' })
+      const title = await Title.create({ tconst: `tt${crypto.randomBytes(4).toString('hex')}` })
+      const proposal = await Proposal.create({ search_session_uuid: searchSession.uuid, tconst: title.tconst })
       uuid = proposal.uuid
     })
 
@@ -216,7 +219,8 @@ describe('#findAll', () => {
   describe('when a correct search session uuid is given ', () => {
     test('returns a 200 status code', async () => {
       const searchSession = await SearchSession.create()
-      await Proposal.create({ search_session_uuid: searchSession.uuid, tconst: 'tt00000000' })
+      const title = await Title.create({ tconst: `tt${crypto.randomBytes(4).toString('hex')}` })
+      await Proposal.create({ search_session_uuid: searchSession.uuid, tconst: title.tconst })
 
       return request(app)
         .get('/proposals')
@@ -226,15 +230,18 @@ describe('#findAll', () => {
 
     test('returns a the list of proposals', async () => {
       const searchSession = await SearchSession.create()
-      await Proposal.create({ search_session_uuid: searchSession.uuid, tconst: 'tt00000000' })
-      await Proposal.create({ search_session_uuid: searchSession.uuid, tconst: 'tt00000001' })
+      const title1 = await Title.create({ tconst: `tt${crypto.randomBytes(4).toString('hex')}` })
+      const title2 = await Title.create({ tconst: `tt${crypto.randomBytes(4).toString('hex')}` })
+
+      await Proposal.create({ search_session_uuid: searchSession.uuid, tconst: title1.tconst })
+      await Proposal.create({ search_session_uuid: searchSession.uuid, tconst: title2.tconst })
 
       return request(app)
         .get('/proposals')
         .query({ search_session_uuid: searchSession.uuid })
         .then(response => {
           expect(response.body).toHaveLength(2)
-          expect(response.body[0].tconst).toEqual('tt00000000')
+          expect(response.body[0].tconst).toEqual(title1.tconst)
         })
     })
   })
@@ -287,7 +294,8 @@ describe('#update ', () => {
 
     beforeEach(async () => {
       const searchSession = await SearchSession.create()
-      proposal = await Proposal.create({ search_session_uuid: searchSession.uuid, tconst: 'tt00000000' })
+      const title = await Title.create({ tconst: `tt${crypto.randomBytes(4).toString('hex')}` })
+      proposal = await Proposal.create({ search_session_uuid: searchSession.uuid, tconst: title.tconst })
       uuid = proposal.uuid
     })
 

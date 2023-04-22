@@ -46,8 +46,5 @@ module.exports = (sequelize, DataTypes) => {
     underscored: true
   })
 
-  // Skip migration for this model
-  Title.sync = () => Promise.resolve()
-
   return Title
 }

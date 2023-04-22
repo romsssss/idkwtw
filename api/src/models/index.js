@@ -27,10 +27,9 @@ db.proposals.belongsTo(db.search_sessions, {
   foreignKey: 'search_session_uuid'
 })
 
-// Below do not work as titles is a view and not a table
-// db.proposals.belongsTo(db.titles, {
-//   foreignKey: 'tconst '
-// });
+db.proposals.belongsTo(db.titles, {
+  foreignKey: 'tconst'
+})
 
 db.search_sessions.hasMany(db.proposals, {
   foreignKey: 'search_session_uuid'

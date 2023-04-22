@@ -15,10 +15,11 @@ Add required ENV variables in a `.env.development` file
 * `DB_PASSWORD`
 * `DB_NAME`
 
-Create the database
+Create and seed the database
 
 ```bash
 psql -U $DB_USER -d $DB_NAME < data/schema.sql
+psql -U $DB_USER -d $DB_NAME < data/seed.sql
 ```
 
 ## Run project
