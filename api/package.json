@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "test": "NODE_ENV=test jest --config=test/jest.config.js",
+    "test": "NODE_ENV=test jest --config=test/jest.config.js --randomize",
     "lint": "eslint ./"
   },
   "dependencies": {

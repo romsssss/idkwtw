@@ -53,8 +53,7 @@ class VideoCreatorService {
       redirect: 'follow'
     }
 
-    // const response = await fetch(`https://api.themoviedb.org/3/movie/${this.tconst}/videos?api_key=${process.env.API_KEY_THE_MOVIE_DB}&language=en-US`, requestOptions)
-    const response = await fetch(`toto`, requestOptions)
+    const response = await fetch(`https://api.themoviedb.org/3/movie/${this.tconst}/videos?api_key=${process.env.API_KEY_THE_MOVIE_DB}&language=en-US`, requestOptions)
     const responseJson = await response.json()
     let results = responseJson.results
 
