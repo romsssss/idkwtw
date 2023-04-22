@@ -45,3 +45,25 @@ CREATE TABLE IF NOT EXISTS public.proposals (
     CONSTRAINT proposal_search_session_uuid_fkey FOREIGN KEY(search_session_uuid) REFERENCES public.search_sessions(uuid),
     CONSTRAINT proposal_search_session_tconst_fkey FOREIGN KEY(tconst) REFERENCES public.titles(tconst)
 );
+
+DROP TYPE IF EXISTS public.enum_videos_type;
+CREATE TYPE public.enum_videos_type AS ENUM ('trailer');
+DROP TYPE IF EXISTS public.enum_videos_site;
+CREATE TYPE public.enum_videos_site AS ENUM ('youtube');
+CREATE TABLE public.videos (
+    uuid uuid NOT NULL,
+    name text,
+    type public.enum_videos_type NOT NULL,
+    site public.enum_videos_site NOT NULL,
+    key varchar NOT NULL,
+    size int4,
+    official bool,
+    iso_639_1 varchar,
+    iso_3166_1 varchar,
+    published_at timestamptz,
+    created_at timestamptz NOT NULL,
+    updated_at timestamptz NOT NULL,
+    tconst varchar,
+    CONSTRAINT videos_tconst_fkey FOREIGN KEY (tconst) REFERENCES public.titles(tconst),
+    PRIMARY KEY (uuid)
+);

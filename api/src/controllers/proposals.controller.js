@@ -3,6 +3,7 @@ const db = require('../models')
 const SearchSession = db.search_sessions
 const Proposal = db.proposals
 const Title = db.titles
+const Video = db.videos
 const ProposalCreatorService = require('../services/proposal_creator.service')
 
 exports.create = async (req, res) => {
@@ -42,7 +43,7 @@ exports.findOne = (req, res) => {
     return
   }
 
-  Proposal.findByPk(uuid, { include: [Title] })
+  Proposal.findByPk(uuid, { include: [{ model: Title, include: [Video] }] })
     .then(proposal => {
       if (proposal) {
         res.send(proposal)
@@ -78,7 +79,7 @@ exports.findAll = async (req, res) => {
     return
   }
 
-  Proposal.findAll({ where: { search_session_uuid: searchSession.uuid }, include: [Title] })
+  Proposal.findAll({ where: { search_session_uuid: searchSession.uuid }, include: [{ model: Title, include: [Video] }] })
     .then(proposals => {
       res.send(proposals)
     })

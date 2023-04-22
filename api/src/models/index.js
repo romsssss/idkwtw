@@ -22,12 +22,21 @@ db.sequelize = sequelize
 db.titles = require('./title.model.js')(sequelize, Sequelize)
 db.search_sessions = require('./search_session.model.js')(sequelize, Sequelize)
 db.proposals = require('./proposal.model.js')(sequelize, Sequelize)
+db.videos = require('./video.model.js')(sequelize, Sequelize)
 
 db.proposals.belongsTo(db.search_sessions, {
   foreignKey: 'search_session_uuid'
 })
 
 db.proposals.belongsTo(db.titles, {
+  foreignKey: 'tconst'
+})
+
+db.videos.belongsTo(db.titles, {
+  foreignKey: 'tconst'
+})
+
+db.titles.hasMany(db.videos, {
   foreignKey: 'tconst'
 })
 
