@@ -1,0 +1,32 @@
+name: "(api) Linter"
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'api/**'
+    branches:
+      - main
+  pull_request:
+      paths:
+      - 'api/**'
+
+defaults:
+  run:
+    working-directory: api
+
+jobs:
+  lint:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version-file: '.node-version'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm install
+      - name: Lint code
+        run: npm run lint
