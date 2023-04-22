@@ -16,7 +16,7 @@ defaults:
     working-directory: api
 
 jobs:
-  lint:
+  eslint:
 
     runs-on: ubuntu-latest
 

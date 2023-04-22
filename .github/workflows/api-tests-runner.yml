@@ -16,7 +16,7 @@ defaults:
     working-directory: api
 
 jobs:
-  lint:
+  jest:
 
     runs-on: ubuntu-latest
 
@@ -28,6 +28,7 @@ jobs:
             POSTGRES_PASSWORD: postgres
             POSTGRES_USER: postgres
             POSTGRES_DB: postgres
+            POSTGRES_PORT: 5432
 
           options: >-
             --health-cmd pg_isready
@@ -47,6 +48,9 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Prepate Database
-        run: PGPASSWORD=postgres psql -U postgres -d postgres < data/schema.sql
+        run: psql -h postgres -d postgres -U postgres -c 'SELECT 1;'
+        env:
+          PGPASSWORD: postgres
+        # run: PGPASSWORD=postgres psql -U postgres -d postgres -p 5432 < data/schema.sql
       - name: Run tests
         run: npm test
