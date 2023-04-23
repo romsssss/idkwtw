@@ -1,5 +1,13 @@
 # IDKWTWT API
 
+[![Tests][tests-badge]][tests-url]
+[![Linter][linter-badge]][linter-url]
+
+[tests-badge]: https://github.com/romsssss/idkwtw/actions/workflows/api-tests-runner.yml/badge.svg?branch=main
+[tests-url]: https://github.com/romsssss/idkwtw/actions/workflows/api-tests-tests-runner.yml?query=branch%3Amain
+[linter-badge]:https://github.com/romsssss/idkwtw/actions/workflows/api-linter-runner.yml/badge.svg?branch=main
+[linter-url]: https://github.com/romsssss/idkwtw/actions/workflows/api-linter-runner.yml?query=branch%3Amain
+
 ## Project setup
 
 Install dependencies
