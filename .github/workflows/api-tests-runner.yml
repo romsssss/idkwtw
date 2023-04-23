@@ -1,0 +1,61 @@
+name: "(api) Tests"
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'api/**'
+    branches:
+      - main
+  pull_request:
+      paths:
+      - 'api/**'
+
+defaults:
+  run:
+    working-directory: api
+
+jobs:
+  jest:
+
+    runs-on: ubuntu-latest
+
+    services:
+        postgres:
+          image: postgres
+
+          env:
+            POSTGRES_PASSWORD: postgres
+            POSTGRES_USER: postgres
+            POSTGRES_DB: postgres
+            POSTGRES_PORT: 5432
+
+          options: >-
+            --health-cmd pg_isready
+            --health-interval 10s
+            --health-timeout 5s
+            --health-retries 5
+          ports:
+            - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version-file: 'api/.node-version'
+          cache: 'npm'
+          cache-dependency-path: 'api'
+      - name: Install dependencies
+        run: npm install
+      - name: Prepate Database
+        run: psql -f data/schema.sql postgresql://postgres:postgres@localhost:5432/postgres
+        env:
+          PGPASSWORD: postgres
+      - name: Run tests
+        run: npm test
+        env:
+          NODE_ENV: test
+          DB_HOST: localhost
+          DB_USER: postgres
+          DB_PASSWORD: postgres
+          DB_NAME: postgres
