@@ -6,8 +6,9 @@ const Title = db.titles
 const Video = db.videos
 
 class ProposalCreatorService {
-  constructor (searchSessionUUID) {
+  constructor (searchSessionUUID, tconst = null) {
     this.searchSessionUUID = searchSessionUUID
+    this.tconst = tconst
   }
 
   async perform () {
@@ -36,8 +37,11 @@ class ProposalCreatorService {
   }
 
   async _pickTitle () {
-    return await Title.findOne({ order: db.sequelize.random(), include: Video })
-    // return await Title.findByPk('tt0137523', { include: Video })
+    if (this.tconst) {
+      return await Title.findByPk(this.tconst, { include: Video })
+    } else {
+      return await Title.findOne({ order: db.sequelize.random(), include: Video })
+    }
   }
 }
 

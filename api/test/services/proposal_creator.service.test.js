@@ -28,10 +28,11 @@ describe('#perform', () => {
 
   describe('when search session exist', () => {
     let searchSession
+    let title
 
     beforeEach(async () => {
       searchSession = await SearchSession.create()
-      await Title.create({ tconst: `tt${crypto.randomBytes(4).toString('hex')}` })
+      title = await Title.create({ tconst: `tt${crypto.randomBytes(4).toString('hex')}` })
     })
 
     describe('when everythig goes fine', () => {
@@ -73,14 +74,14 @@ describe('#perform', () => {
       })
 
       test('returns success false', async () => {
-        const proposalCreatorServiceInstance = new ProposalCreatorService(searchSession.uuid)
+        const proposalCreatorServiceInstance = new ProposalCreatorService(searchSession.uuid, title.tconst)
         const res = await proposalCreatorServiceInstance.perform()
 
         expect(res.success).toBe(false)
       })
 
       test('returns an error', async () => {
-        const proposalCreatorServiceInstance = new ProposalCreatorService(searchSession.uuid)
+        const proposalCreatorServiceInstance = new ProposalCreatorService(searchSession.uuid, title.tconst)
         const res = await proposalCreatorServiceInstance.perform()
 
         expect(res.error.message).toEqual('Oops')
