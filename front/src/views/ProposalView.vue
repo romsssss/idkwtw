@@ -13,12 +13,16 @@ const proposal = computed(() => store.getProposalByUuid(proposalUuid));
 const title = computed(() => store.getTitleByTconst(proposal.value?.tconst));
 const searchSession = computed(() => store.getSearchSessionByUuid(proposal.value?.search_session_uuid));
 
-// import { storeToRefs } from 'pinia'
-// const { getProposalByUuid } = storeToRefs(store)
-// // {{ getProposalByUuid(proposalUuid) }}
-
 onMounted(async () => {
   await fetchData()
+})
+
+const youtubeEmbedUrl = computed(() => {
+  if (title.value?.video?.site !== 'youtube' || !title.value?.video?.key) {
+    return undefined;
+  }
+
+  return `https://www.youtube.com/embed/${title.value.video.key}`
 })
 
 async function fetchData() {
@@ -67,6 +71,18 @@ async function createNewProposal() {
 
     <h2>Title</h2>
     {{ title }}
+    <br />
+    {{  youtubeEmbedUrl  }}
+
+    <div>
+      <iframe
+        :src="youtubeEmbedUrl"
+        title="Trailer"
+        frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowfullscreen>
+      </iframe>
+    </div>
 
     <div class="actions">
       <div v-if="proposal?.accepted">
