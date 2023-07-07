@@ -12,8 +12,12 @@ const searchSession = computed(() => store.getSearchSessionByUuid(searchSessionU
 const SearchSessionPublics = ['alone', 'date', 'partner', 'kids', 'friends', 'family']
 
 onMounted(async () => {
-  await store.fetchSearchSession(searchSessionUuid);
+  await fetchData()
 })
+
+async function fetchData() {
+  if(!searchSession.value) { await store.fetchSearchSession(searchSessionUuid) }
+}
 
 async function savePublic(item: string) {
   await store.updateSearchSession(searchSession.value?.uuid, { public: item } )

@@ -26,9 +26,9 @@ const youtubeEmbedUrl = computed(() => {
 })
 
 async function fetchData() {
-  await store.fetchProposal(proposalUuid);
-  await store.fetchTitle(proposal.value?.tconst);
-  await store.fetchSearchSession(proposal.value?.search_session_uuid);
+  if(!proposal.value) { await store.fetchProposal(proposalUuid); }
+  if(!title.value) { await store.fetchTitle(proposal.value?.tconst); }
+  if(!searchSession.value) { await store.fetchSearchSession(proposal.value?.search_session_uuid); }
 }
 
 async function accept() {
