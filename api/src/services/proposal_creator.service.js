@@ -17,12 +17,19 @@ class ProposalCreatorService {
 
       if (!searchSession) { throw new Error('Search Session not found') }
 
-      const title = await this._pickTitle()
-      if (!title.video) {
-        const videoCreatorServiceInstance = new VideoCreatorService(title.tconst)
-        const serviceRes = await videoCreatorServiceInstance.perform()
-        if (!serviceRes.success) { throw serviceRes.error }
-      }
+      let attempts = 0
+      let title = null
+      let videoCreatorServiceRes = null
+      do {
+        attempts += 1
+        title = await this._pickTitle()
+        if (!title.video) {
+          const videoCreatorServiceInstance = new VideoCreatorService(title.tconst)
+          videoCreatorServiceRes = await videoCreatorServiceInstance.perform()
+        }
+      } while (attempts <= 10 && !videoCreatorServiceRes.success)
+
+      if (!videoCreatorServiceRes.success) { throw videoCreatorServiceRes.error }
 
       const proposalParams = {
         tconst: title.tconst,

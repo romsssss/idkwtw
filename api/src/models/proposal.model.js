@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.BOOLEAN
     },
     already_seen_feedback: {
-      type: DataTypes.ENUM('liked', 'disliked', 'do_no_remember')
+      type: DataTypes.ENUM('liked', 'disliked', 'do_not_remember')
     }
   }, {
     tableName: 'proposals',

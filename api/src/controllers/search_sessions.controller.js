@@ -35,7 +35,10 @@ exports.findOne = (req, res) => {
     return
   }
 
-  SearchSession.findByPk(uuid, { include: [Proposal] })
+  const includeParam = req.query.include
+  const includeOptions = includeParam?.includes('proposals') ? { include: [Proposal] } : {}
+
+  SearchSession.findByPk(uuid, includeOptions)
     .then(searchSession => {
       if (searchSession) {
         res.send(searchSession)

@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS public.search_sessions (
 DROP TYPE IF EXISTS public.enum_proposals_rejected_feedback CASCADE;
 CREATE TYPE public.enum_proposals_rejected_feedback AS ENUM ('too_long', 'too_old', 'too_violent', 'too_scary');
 DROP TYPE IF EXISTS public.enum_proposals_already_seen_feedback CASCADE;
-CREATE TYPE public.enum_proposals_already_seen_feedback AS ENUM ('liked', 'disliked', 'do_no_remember');
+CREATE TYPE public.enum_proposals_already_seen_feedback AS ENUM ('liked', 'disliked', 'do_not_remember');
 CREATE TABLE IF NOT EXISTS public.proposals (
     uuid uuid NOT NULL,
     search_session_uuid uuid,

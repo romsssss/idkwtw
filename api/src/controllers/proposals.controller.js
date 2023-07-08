@@ -43,7 +43,10 @@ exports.findOne = (req, res) => {
     return
   }
 
-  Proposal.findByPk(uuid, { include: [{ model: Title, include: [Video] }] })
+  const includeParam = req.query.include
+  const includeOptions = includeParam?.includes('title') ? { include: [{ model: Title, include: [Video] }] } : {}
+
+  Proposal.findByPk(uuid, includeOptions)
     .then(proposal => {
       if (proposal) {
         res.send(proposal)
@@ -79,7 +82,10 @@ exports.findAll = async (req, res) => {
     return
   }
 
-  Proposal.findAll({ where: { search_session_uuid: searchSession.uuid }, include: [{ model: Title, include: [Video] }] })
+  const includeParam = req.query.include
+  const includeOptions = includeParam?.includes('title') ? { include: [{ model: Title, include: [Video] }] } : {}
+
+  Proposal.findAll({ where: { search_session_uuid: searchSession.uuid }, ...includeOptions })
     .then(proposals => {
       res.send(proposals)
     })
