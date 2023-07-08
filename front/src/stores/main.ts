@@ -1,53 +1,7 @@
 import { defineStore } from "pinia";
-
-type SearchSessionPublics = 'alone' | 'date' | 'partner' | 'kids' | 'friends' | 'family';
-type ProposalRejectedFeedback = 'too_long' | 'too_old' | 'too_violent' | 'too_scary';
-type ProposalAlreadySeenFeedback = 'liked' | 'disliked' | 'do_not_remember';
-
-interface SearchSession {
-  uuid: string,
-  public: SearchSessionPublics | null,
-  genres: string[],
-  tconst_chosen: string | null
-}
-
-interface Proposal {
-  uuid: string,
-  search_session_uuid: string,
-  tconst: string,
-  accepted: boolean | null,
-  rejected_feedback: ProposalRejectedFeedback | null,
-  already_seen: boolean | null,
-  already_seen_feedback: ProposalAlreadySeenFeedback | null
-}
-
-interface Title {
-  tconst: string,
-  title_type: string,
-  primary_title: string,
-  original_title: string,
-  is_adult: boolean,
-  start_year: number,
-  end_year: number,
-  runtime_minutes: number,
-  genres: string[],
-  average_rating: number,
-  num_votes: number,
-  video: Video,
-}
-
-interface Video {
-  uuid: string,
-  name: string,
-  type: string,
-  site: string,
-  key: string,
-  size: number,
-  official: boolean,
-  iso_639_1: string,
-  iso_3166_1: string,
-  published_at: string,
-}
+import type { SearchSession } from '@/models/search_session.model';
+import type { Proposal } from '@/models/proposal.model';
+import type { Title } from '@/models/title.model';
 
 const apiBaseUrl = 'http://127.0.0.1:3000'
 
