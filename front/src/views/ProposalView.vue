@@ -7,7 +7,7 @@ const router = useRouter();
 const route = useRoute();
 const store = mainStore();
 
-let proposalUuid = route.params.uuid;
+let proposalUuid = route.params.uuid as string;
 const proposal = computed(() => store.getProposalByUuid(proposalUuid));
 const title = computed(() => store.getTitleByTconst(proposal.value?.tconst));
 const searchSession = computed(() => store.getSearchSessionByUuid(proposal.value?.search_session_uuid));
@@ -57,9 +57,9 @@ function unsetVideoEmbedMode() {
 }
 
 async function fetchData() {
-  if(!proposal.value) { await store.fetchProposal(proposalUuid); }
-  if(!title.value) { await store.fetchTitle(proposal.value?.tconst); }
-  if(!searchSession.value) { await store.fetchSearchSession(proposal.value?.search_session_uuid); }
+  if(!proposal.value && proposalUuid) { await store.fetchProposal(proposalUuid); }
+  if(!title.value && proposal.value?.tconst) { await store.fetchTitle(proposal.value.tconst); }
+  if(!searchSession.value && proposal.value?.search_session_uuid) { await store.fetchSearchSession(proposal.value.search_session_uuid); }
 }
 
 async function accept() {

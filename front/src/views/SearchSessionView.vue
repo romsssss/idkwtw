@@ -7,7 +7,7 @@ const router = useRouter();
 const route = useRoute();
 const store = mainStore();
 
-const searchSessionUuid = route.params.uuid;
+const searchSessionUuid = route.params.uuid as string;
 const searchSession = computed(() => store.getSearchSessionByUuid(searchSessionUuid));
 const SearchSessionPublics = ['alone', 'date', 'partner', 'kids', 'friends', 'family']
 

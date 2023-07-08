@@ -59,17 +59,17 @@ export const mainStore = defineStore("main_store", {
   }),
   getters: {
     getSearchSessionByUuid: (state) => {
-      return (uuid) => state.searchSessions.find(searchSession => searchSession.uuid === uuid)
+      return (uuid: string | undefined) => state.searchSessions.find(searchSession => searchSession.uuid === uuid)
     },
     getProposalByUuid: (state) => {
-      return (uuid) => state.proposals.find(proposal => proposal.uuid === uuid)
+      return (uuid: string | undefined) => state.proposals.find(proposal => proposal.uuid === uuid)
     },
     getTitleByTconst: (state) => {
-      return (tconst) => state.titles.find(title => title.tconst === tconst)
+      return (tconst: string | undefined) => state.titles.find(title => title.tconst === tconst)
     }
   },
   actions: {
-    async fetchTitle(tconst) {
+    async fetchTitle(tconst: string) {
       const response = await fetch(`${apiBaseUrl}/titles/${tconst}`)
       const title = await response.json() as unknown as Title;
 
@@ -85,7 +85,7 @@ export const mainStore = defineStore("main_store", {
         })
       }
     },
-    async fetchProposal(uuid) {
+    async fetchProposal(uuid: string) {
       const response = await fetch(`${apiBaseUrl}/proposals/${uuid}`)
       const proposal = await response.json() as unknown as Proposal;
 
@@ -101,7 +101,7 @@ export const mainStore = defineStore("main_store", {
         })
       }
     },
-    async fetchSearchSession(uuid) {
+    async fetchSearchSession(uuid: string) {
       const response = await fetch(`${apiBaseUrl}/search_sessions/${uuid}`)
       const searchSession = await response.json() as unknown as SearchSession;
 
@@ -132,7 +132,7 @@ export const mainStore = defineStore("main_store", {
 
       return searchSession.uuid;
     },
-    async updateSearchSession(uuid, data) {
+    async updateSearchSession(uuid: string | undefined, data: object) {
       const response = await fetch(`${apiBaseUrl}/search_sessions/${uuid}`, {
         method: "PUT",
         headers: {
@@ -155,7 +155,9 @@ export const mainStore = defineStore("main_store", {
         })
       }
     },
-    async createProposal(searchSessionUuid) {
+    async createProposal(searchSessionUuid: string | undefined) {
+      if (!searchSessionUuid) { return null }
+
       const url = `${apiBaseUrl}/proposals?` + new URLSearchParams({ 'search_session_uuid': searchSessionUuid })
       const response = await fetch(url, {
         method: "POST",
@@ -171,7 +173,7 @@ export const mainStore = defineStore("main_store", {
 
       return proposal.uuid;
     },
-    async updateProposal(uuid, data) {
+    async updateProposal(uuid: string | undefined, data: object) {
       const response = await fetch(`${apiBaseUrl}/proposals/${uuid}`, {
         method: "PUT",
         headers: {
@@ -180,7 +182,7 @@ export const mainStore = defineStore("main_store", {
         body: JSON.stringify(data),
       });
 
-      const proposal = await response.json() as unknown as SearchSession;
+      const proposal = await response.json() as unknown as Proposal;
 
       const index = this.proposals.findIndex(proposal => proposal.uuid === uuid);
 
