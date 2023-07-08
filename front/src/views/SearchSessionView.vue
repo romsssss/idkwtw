@@ -2,6 +2,7 @@
 import { onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { mainStore } from "@/stores/main";
+import { searchSessionPublics } from '@/models/search_session.model';
 
 const router = useRouter();
 const route = useRoute();
@@ -9,7 +10,6 @@ const store = mainStore();
 
 const searchSessionUuid = route.params.uuid as string;
 const searchSession = computed(() => store.getSearchSessionByUuid(searchSessionUuid));
-const SearchSessionPublics = ['alone', 'date', 'partner', 'kids', 'friends', 'family']
 
 onMounted(async () => {
   await fetchData()
@@ -33,10 +33,7 @@ async function startProposals() {
   <main>
     <h2>Who are you watching with ?</h2>
     <div>
-      {{ searchSession }}
-    </div>
-    <div>
-      <button v-for="item in SearchSessionPublics" :key="item" @click="savePublic(item)">
+      <button v-for="item in searchSessionPublics" :key="item" @click="savePublic(item)">
         {{ item }}
       </button>
       <br />

@@ -2,6 +2,7 @@
 import { onMounted, onUnmounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { mainStore } from "@/stores/main";
+import { proposalRejectedFeedback, proposalAlreadySeenFeedback } from '@/models/proposal.model';
 
 const router = useRouter();
 const route = useRoute();
@@ -32,12 +33,6 @@ const youtubeEmbedUrl = computed(() => {
   url.searchParams.append('controls', '0');
   url.searchParams.append('modestbranding', '1');
   url.searchParams.append('rel', '0');
-
-  // url.searchParams.append('showinfo', '0');
-  // url.searchParams.append('disablekb', '1');
-  // url.searchParams.append('enablejsapi', '1');
-  // url.searchParams.append('iv_load_policy', '3');
-  // url.searchParams.append('version', '3');
 
   return url
 })
@@ -122,16 +117,15 @@ async function createNewProposal() {
       </div>
       <div v-else-if="proposal?.already_seen">
         <div>I've already seen it...</div>
-        <button @click="alreadySeenFeedback('liked')">...and I liked it</button><br />
-        <button @click="alreadySeenFeedback('disliked')">...and I disliked it</button><br />
-        <button @click="alreadySeenFeedback('do_not_remember')">...and I don't remember</button><br />
+        <button v-for="feedback in proposalAlreadySeenFeedback" :key="feedback" @click="alreadySeenFeedback(feedback)">
+          {{ feedback }}
+        </button>
       </div>
       <div v-else-if="proposal?.accepted === false">
         <div>Nope, show me something else...</div>
-        <button @click="rejectFeeback('too_long')">...this one is too long</button><br />
-        <button @click="rejectFeeback('too_old')">...this one is too old</button><br />
-        <button @click="rejectFeeback('too_violent')">...this one is too violent</button><br />
-        <button @click="rejectFeeback('too_scary')">...this one is too scary</button><br />
+        <button v-for="feedback in proposalRejectedFeedback" :key="feedback" @click="rejectFeeback(feedback)">
+          {{ feedback }}
+        </button>
         <button @click="createNewProposal">...don't know why but no</button><br />
       </div>
       <div v-else>

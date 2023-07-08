@@ -1,18 +1,3 @@
-interface Title {
-  tconst: string,
-  title_type: string,
-  primary_title: string,
-  original_title: string,
-  is_adult: boolean,
-  start_year: number,
-  end_year: number,
-  runtime_minutes: number,
-  genres: string[],
-  average_rating: number,
-  num_votes: number,
-  video: Video,
-}
-
 interface Video {
   uuid: string,
   name: string,
@@ -26,4 +11,17 @@ interface Video {
   published_at: string,
 }
 
-export { type Title };
+export interface Title {
+  tconst: string,
+  title_type: string,
+  primary_title: string,
+  original_title: string,
+  is_adult: boolean,
+  start_year: number,
+  end_year: number,
+  runtime_minutes: number,
+  genres: string[],
+  average_rating: number,
+  num_votes: number,
+  video: Video,
+}

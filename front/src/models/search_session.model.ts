@@ -1,11 +1,11 @@
 
-type SearchSessionPublics = 'alone' | 'date' | 'partner' | 'kids' | 'friends' | 'family';
+export const searchSessionPublics = ['alone', 'date', 'partner', 'kids', 'friends', 'family'] as const;
 
-interface SearchSession {
+type SearchSessionPublics = typeof searchSessionPublics[number];
+
+export interface SearchSession {
   uuid: string,
   public: SearchSessionPublics | null,
   genres: string[],
   tconst_chosen: string | null
 }
-
-export { type SearchSession };
