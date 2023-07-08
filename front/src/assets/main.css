@@ -1,0 +1,17 @@
+@import './base.css';
+
+html.video-embed-mode {
+  overflow: auto;
+}
+
+.video-embed-mode {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  border: none;
+ }
+
+header.with-video-embed-mode {
+  position: absolute;
+  top: 0;
+}
