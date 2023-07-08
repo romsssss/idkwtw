@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { onMounted, computed } from 'vue'
+import { onMounted, onUnmounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { mainStore } from "@/stores/main";
-
 
 const router = useRouter();
 const route = useRoute();
@@ -14,7 +13,12 @@ const title = computed(() => store.getTitleByTconst(proposal.value?.tconst));
 const searchSession = computed(() => store.getSearchSessionByUuid(proposal.value?.search_session_uuid));
 
 onMounted(async () => {
+  setVideoEmbedMode()
   await fetchData()
+})
+
+onUnmounted(() => {
+  unsetVideoEmbedMode()
 })
 
 const youtubeEmbedUrl = computed(() => {
@@ -22,8 +26,35 @@ const youtubeEmbedUrl = computed(() => {
     return undefined;
   }
 
-  return `https://www.youtube.com/embed/${title.value.video.key}`
+  let url = new URL(`https://www.youtube-nocookie.com/embed/${title.value.video.key}`)
+  url.searchParams.append('autoplay', '1');
+  url.searchParams.append('loop', '1');
+  url.searchParams.append('controls', '0');
+  url.searchParams.append('modestbranding', '1');
+  url.searchParams.append('rel', '0');
+
+  // url.searchParams.append('showinfo', '0');
+  // url.searchParams.append('disablekb', '1');
+  // url.searchParams.append('enablejsapi', '1');
+  // url.searchParams.append('iv_load_policy', '3');
+  // url.searchParams.append('version', '3');
+
+  return url
 })
+
+function setVideoEmbedMode() {
+  document.documentElement.classList.add('video-embed-mode');
+  document.body.classList.add("video-embed-mode");
+  document.getElementById("app")?.classList.add('video-embed-mode');
+  document.getElementsByTagName('header')[0]?.classList.add('with-video-embed-mode');
+}
+
+function unsetVideoEmbedMode() {
+  document.documentElement.classList.remove('video-embed-mode')
+  document.body.classList.remove("video-embed-mode");
+  document.getElementById("app")?.classList.remove('video-embed-mode');
+  document.getElementsByTagName('header')[0]?.classList.remove('with-video-embed-mode');
+}
 
 async function fetchData() {
   if(!proposal.value) { await store.fetchProposal(proposalUuid); }
@@ -62,29 +93,30 @@ async function createNewProposal() {
 </script>
 
 <template>
-  <main>
-    <h2>Search Session</h2>
-    {{ searchSession }}
+  <main class="video-embed-mode">
+    <iframe
+      class="iframe-video-embed video-embed-mode"
+      width="100%"
+      height="100%"
+      marginheight="0"
+      marginwidth="0"
+      scrolling="auto"
+      frameborder="0"
+      :src="youtubeEmbedUrl?.toString()"
+      title="Trailer"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      allowfullscreen>
+    </iframe>
 
-    <h2>Proposal</h2>
-    {{ proposal }}
-
-    <h2>Title</h2>
-    {{ title }}
-    <br />
-    {{  youtubeEmbedUrl  }}
-
-    <div>
-      <iframe
-        :src="youtubeEmbedUrl"
-        title="Trailer"
-        frameborder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-        allowfullscreen>
-      </iframe>
+    <div class="title-infos">
+      <h2>{{ title?.primary_title }}</h2>
+      <h3>
+        {{ title?.start_year }}
+        <span v-if="title?.runtime_minutes">- {{ title?.runtime_minutes }}min</span>
+      </h3>
     </div>
 
-    <div class="actions">
+    <div class="proposal-actions">
       <div v-if="proposal?.accepted">
         🎉
       </div>
@@ -112,4 +144,29 @@ async function createNewProposal() {
 </template>
 
 <style scoped>
+.iframe-video-embed {
+ display: block;
+ width: 100%;
+ border: none;
+ overflow-y: auto;
+ overflow-x: hidden;
+}
+
+.title-infos {
+  border: 2px solid white;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  color: #ffffff;
+  padding: 30px;
+}
+
+.proposal-actions {
+  border: 2px solid white;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  color: #ffffff;
+  padding: 30px;
+}
 </style>
