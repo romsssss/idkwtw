@@ -1,10 +1,11 @@
 const db = require('../models')
 const Title = db.titles
+const Video = db.videos
 
 exports.findOne = (req, res) => {
   const tconst = req.params.tconst
 
-  Title.findByPk(tconst)
+  Title.findByPk(tconst, { include: [Video] })
     .then(title => {
       if (title) {
         res.send(title)
