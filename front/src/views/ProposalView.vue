@@ -39,16 +39,14 @@ const youtubeEmbedUrl = computed(() => {
 
 function setVideoEmbedMode() {
   document.documentElement.classList.add('video-embed-mode');
-  document.body.classList.add("video-embed-mode");
   document.getElementById("app")?.classList.add('video-embed-mode');
-  document.getElementsByTagName('header')[0]?.classList.add('with-video-embed-mode');
+  document.getElementsByTagName('header')[0]?.classList.add('video-embed-mode');
 }
 
 function unsetVideoEmbedMode() {
   document.documentElement.classList.remove('video-embed-mode')
-  document.body.classList.remove("video-embed-mode");
   document.getElementById("app")?.classList.remove('video-embed-mode');
-  document.getElementsByTagName('header')[0]?.classList.remove('with-video-embed-mode');
+  document.getElementsByTagName('header')[0]?.classList.remove('video-embed-mode');
 }
 
 async function fetchData() {
@@ -151,7 +149,6 @@ async function createNewProposal() {
   position: absolute;
   bottom: 0;
   left: 0;
-  color: #ffffff;
   padding: 30px;
 }
 
@@ -160,7 +157,6 @@ async function createNewProposal() {
   position: absolute;
   bottom: 0;
   right: 0;
-  color: #ffffff;
   padding: 30px;
 }
 </style>

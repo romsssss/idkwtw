@@ -1,17 +1,68 @@
+@import './font.css';
 @import './base.css';
+@import './button.css';
+
+html, body, #app, main {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  border: none;
+}
+
+#app {
+  display: flex;
+  flex-flow: column;
+}
+
+header {
+  flex: 0 1 auto;
+  width: 100%;
+  text-align: center;
+  padding: 20px;
+  border: 1px solid red;
+}
+
+main {
+  flex: 1 1 auto;
+  color: var(--color-text);
+  border: 1px solid green;
+}
 
 html.video-embed-mode {
   overflow: auto;
 }
 
-.video-embed-mode {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  border: none;
- }
+#app.video-embed-mode {
+  background-image: none !important;
+}
 
-header.with-video-embed-mode {
+header.video-embed-mode {
   position: absolute;
   top: 0;
+}
+
+#app {
+  background-color: black;
+  background-image: url('https://images.unsplash.com/photo-1620145648299-f926ac0a9470?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=987&q=80');
+  /* background-image: url('https://images.unsplash.com/photo-1574267432553-4b4628081c31?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2062&q=80'); */
+  /* background-image: url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2670&q=80'); */
+  /* background-image: url('https://images.unsplash.com/photo-1559570278-eb8d71d06403?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=652&q=80'); */
+  /* background-image: url('https://images.unsplash.com/photo-1524712245354-2c4e5e7121c0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2232&q=80'); */
+  /* background-image: url('https://images.unsplash.com/photo-1514306191717-452ec28c7814?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1769&q=80'); */
+  /* background-image: url('https://images.unsplash.com/photo-1458053688450-eef5d21d43b3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1773&q=80'); */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.main-flex {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.main-flex-content {
+  max-width: 600px;
+  padding: 30px;
+  border: 2px solid blue;
 }

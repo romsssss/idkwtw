@@ -46,8 +46,8 @@ function setMode(m: string) {
 </script>
 
 <template>
-  <main>
-    <div v-if="mode === 'public'">
+  <main class="main-flex">
+    <div v-if="mode === 'public'" class="main-flex-content">
       <h2>Who are you watching with ?</h2>
       <div>
         <div v-for="item in searchSessionPublics" :key="item">
@@ -57,7 +57,7 @@ function setMode(m: string) {
         <button @click="setMode('genres')">Skip</button>
       </div>
     </div>
-    <div v-if="mode === 'genres'">
+    <div v-if="mode === 'genres'" class="main-flex-content">
       <h2>What kind of film are you in ?</h2>
       <div>
         <div v-for="item in genres" :key="item">
