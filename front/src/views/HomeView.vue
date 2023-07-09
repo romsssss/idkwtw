@@ -12,12 +12,32 @@ async function findMovie() {
 </script>
 
 <template>
-  <main>
-      <h1>I Don't Know What To Watch</h1>
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-      <button @click="findMovie" role="link">Find a movie</button>
+  <main class="main-flex">
+    <div class="main-flex-content">
+      <h1 class="title">I Don't Know What To Watch</h1>
+      <p class="subtext">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+      <div class="cta-wrapper">
+        <button class="btn btn-cta" role="link" @click="findMovie">
+          Find a movie <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
   </main>
 </template>
 
 <style scoped>
+.cta-wrapper {
+  text-align: right;
+}
+
+.title {
+  font-weight: bold;
+  font-size: 3em;
+  margin-bottom: 20px;
+}
+
+.subtext {
+  font-style: italic;
+  margin-bottom: 30px;
+}
 </style>
