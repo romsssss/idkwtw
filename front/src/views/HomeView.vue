@@ -14,8 +14,9 @@ async function findMovie() {
 <template>
   <main class="main-flex">
     <div class="main-flex-content">
+      <div class="subtitle">Movie recommendation engine</div>
       <h1 class="title">I Don't Know What To Watch</h1>
-      <p class="subtext">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+      <div class="tagline">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</div>
       <div class="cta-wrapper">
         <button class="btn btn-cta" role="link" @click="findMovie">
           Find a movie <i class="fa-solid fa-arrow-right"></i>
@@ -36,7 +37,13 @@ async function findMovie() {
   margin-bottom: 20px;
 }
 
-.subtext {
+.subtitle{
+  text-transform: uppercase;
+  font-weight: bold;
+  color: var(--color-secondary);
+}
+
+.tagline {
   font-style: italic;
   margin-bottom: 30px;
 }
