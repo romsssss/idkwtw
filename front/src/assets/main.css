@@ -19,13 +19,12 @@ header {
   width: 100%;
   text-align: center;
   padding: 20px;
-  border: 1px solid red;
 }
 
 main {
   flex: 1 1 auto;
   color: var(--color-text);
-  border: 1px solid green;
+  overflow: auto;
 }
 
 html.video-embed-mode {
@@ -62,7 +61,6 @@ header.video-embed-mode {
 }
 
 .main-flex-content {
-  max-width: 600px;
-  padding: 30px;
-  border: 2px solid blue;
+  max-width: 700px;
+  padding: 30px 20px;
 }
