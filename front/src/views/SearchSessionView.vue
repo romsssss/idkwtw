@@ -12,38 +12,29 @@ const mode = ref('public');
 
 const searchSessionUuid = route.params.uuid as string;
 const searchSession = computed(() => store.getSearchSessionByUuid(searchSessionUuid));
-const genres = {
-  'Drama': { label: 'Drama', icon: 'fa-masks-theater'},
-  'Documentary': { label: 'Documentary', icon: 'fa-paw'},
-  'Comedy': { label: 'Comedy', icon: 'fa-face-grin-tears'},
-  'Romance': { label: 'Romance', icon: 'fa-heart'},
-  'Crime': { label: 'Crime', icon: 'fa-user-secret'},
-  'Action': { label: 'Action', icon: 'fa-solid fa-user-ninja'},
-  'Thriller': { label: 'Thriller', icon: 'fa-face-flushed'},
-  'Adventure': { label: 'Adventure', icon: 'fa-hat-wizard'},
-  'Biography': { label: 'Biography', icon: 'fa-book'},
-  'Family': { label: 'Family', icon: 'fa-people-roof'},
-  'History': { label: 'History', icon: 'fa-scroll'},
-  'Music': { label: 'Music', icon: 'fa-music'},
-  'Mystery': { label: 'Mystery', icon: 'fa-magnifying-glass'},
-  'Horror': { label: 'Horror', icon: 'fa-ghost'},
-  'Fantasy': { label: 'Fantasy', icon: 'fa-dragon'},
-  'War': { label: 'War', icon: 'fa-person-military-rifle'},
-  'Musical': { label: 'Musical', icon: 'fa-music'},
-  'Animation': { label: 'Animation', icon: 'fa-palette'},
-  'Sport': { label: 'Sport', icon: 'fa-futbol'},
-  'Sci-Fi': { label: 'Sci-Fi', icon: 'fa-robot'},
-  'Western': { label: 'Western', icon: 'fa-hat-cowboy'}
-}
-
-const publics = {
-  'alone': { label: 'By myself' },
-  'date': { label: 'With my date' },
-  'partner': { label: 'With my partner' },
-  'kids': { label: 'With kids' },
-  'friends': { label: 'With friends' },
-  'family': { label: 'With family or relatives' }
-}
+const genres = [
+  'Drama',
+  'Documentary',
+  'Comedy',
+  'Romance',
+  'Crime',
+  'Action',
+  'Thriller',
+  'Adventure',
+  'Biography',
+  'Family',
+  'History',
+  'Music',
+  'Mystery',
+  'Horror',
+  'Fantasy',
+  'War',
+  'Musical',
+  'Animation',
+  'Sport',
+  'Sci-Fi',
+  'Western',
+]
 
 onMounted(async () => {
   await fetchData()
@@ -75,14 +66,17 @@ function setMode(m: string) {
 
 <template>
   <main class="main-flex">
+
     <div v-if="mode === 'public'" class="main-flex-content">
-      <h2 class="title">Who are you watching with ?</h2>
+      <h2 class="title">
+        {{ $t("searchSession.public.title") }}
+      </h2>
       <div class="subtitle"></div>
       <div class="form-container">
         <div v-for="item in searchSessionPublics" :key="item" class="option-wrapper-full-width">
           <div class="option">
             <label :for="item">
-              <span>{{ publics[item].label }}</span>
+              <span>{{ $t(`searchSession.public.label.${item}`) }}</span>
               <input type="radio" name="public" :id="item" :value="item" :checked="searchSession?.public === item" @change="savePublic(item)"/>
               <i class="fa-solid fa-check"></i>
             </label>
@@ -91,22 +85,28 @@ function setMode(m: string) {
       </div>
       <div class="cta-wrapper">
         <button class="btn btn-cta" role="link" @click="setMode('genres')">
-          Next <i class="fa-solid fa-arrow-right"></i>
+          {{ $t("general.next") }}
+          <i class="fa-solid fa-arrow-right"></i>
         </button>
       </div>
     </div>
+
     <div v-if="mode === 'genres'" class="main-flex-content">
-      <h2 class="title">What kind of film are you in ?</h2>
-      <div class="subtitle">Multiple answers are possible</div>
+      <h2 class="title">
+        {{ $t("searchSession.genres.title") }}
+      </h2>
+      <div class="subtitle">
+        {{ $t("searchSession.genres.subtitle") }}
+      </div>
       <div class="form-container">
-        <div v-for="genre in genres" :key="genre.label" class="option-wrapper-half-width">
+        <div v-for="genre in genres" :key="genre" class="option-wrapper-half-width">
           <div class="option">
-            <label :for="genre.label">
+            <label :for="genre">
               <span>
-                <i v-if="genre.icon" class="fa-solid" :class="genre.icon"></i>
-                {{ genre.label }}
+                <i v-if="$t(`searchSession.genres.icon.${genre}`)" class="fa-solid" :class="$t(`searchSession.genres.icon.${genre}`)"></i>
+                {{ $t(`searchSession.genres.label.${genre}`) }}
               </span>
-              <input type="checkbox" name="genres" :id="genre.label" :value="genre.label" :checked="searchSession?.genres && searchSession?.genres.includes(genre.label)" @change="saveGenres()">
+              <input type="checkbox" name="genres" :id="genre" :value="genre" :checked="searchSession?.genres && searchSession?.genres.includes(genre)" @change="saveGenres()">
               <i class="fa-solid fa-check"></i>
             </label>
           </div>
@@ -114,11 +114,13 @@ function setMode(m: string) {
       </div>
       <div class="cta-wrapper">
         <button class="btn btn-cta" role="link" @click="startProposals">
-          Start searching <i class="fa-solid fa-arrow-right"></i>
+          {{ $t("searchSession.startSearching") }}
+          <i class="fa-solid fa-arrow-right"></i>
         </button>
       </div>
     </div>
   </main>
+
 </template>
 
 <style scoped>
@@ -155,7 +157,10 @@ function setMode(m: string) {
     padding: 10px;
   }
 
-  .option label:has(input[type=checkbox]:checked), .option label:has(input[type=radio]:checked) {
+  .option:has(input[type=checkbox]:checked), .option:has(input[type=radio]:checked), .option:hover {
+    border-color: var(--color-secondary);
+  }
+  .option label:has(input[type=checkbox]:checked), .option label:has(input[type=radio]:checked), label:hover {
     background-color: var(--color-secondary);
   }
 

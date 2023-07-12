@@ -14,12 +14,13 @@ async function findMovie() {
 <template>
   <main class="main-flex">
     <div class="main-flex-content">
-      <div class="subtitle">Movie recommendation engine</div>
-      <h1 class="title">I Don't Know What To Watch</h1>
-      <div class="tagline">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</div>
+      <div class="subtitle">{{ $t("home.subtitle") }}</div>
+      <h1 class="title">{{ $t("home.title") }}</h1>
+      <div class="tagline">{{ $t("home.tagline") }}</div>
       <div class="cta-wrapper">
         <button class="btn btn-cta" role="link" @click="findMovie">
-          Find a movie <i class="fa-solid fa-arrow-right"></i>
+          {{ $t("home.ctaLabel") }}
+          <i class="fa-solid fa-arrow-right"></i>
         </button>
       </div>
     </div>
