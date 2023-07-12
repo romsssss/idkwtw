@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { mainStore } from "@/stores/main";
-import { proposalRejectedFeedback, proposalAlreadySeenFeedback } from '@/models/proposal.model';
+import { mainStore } from '@/stores/main'
+import { proposalRejectedFeedback, proposalAlreadySeenFeedback } from '@/models/proposal.model'
 
-const router = useRouter();
-const route = useRoute();
-const store = mainStore();
+const router = useRouter()
+const route = useRoute()
+const store = mainStore()
 
-let proposalUuid = route.params.uuid as string;
-const proposal = computed(() => store.getProposalByUuid(proposalUuid));
-const title = computed(() => store.getTitleByTconst(proposal.value?.tconst));
-const searchSession = computed(() => store.getSearchSessionByUuid(proposal.value?.search_session_uuid));
+let proposalUuid = route.params.uuid as string
+const proposal = computed(() => store.getProposalByUuid(proposalUuid))
+const title = computed(() => store.getTitleByTconst(proposal.value?.tconst))
+const searchSession = computed(() => store.getSearchSessionByUuid(proposal.value?.search_session_uuid))
 
 onMounted(async () => {
   setVideoEmbedMode()
@@ -24,63 +24,69 @@ onUnmounted(() => {
 
 const youtubeEmbedUrl = computed(() => {
   if (title.value?.video?.site !== 'youtube' || !title.value?.video?.key) {
-    return undefined;
+    return undefined
   }
 
   let url = new URL(`https://www.youtube-nocookie.com/embed/${title.value.video.key}`)
-  url.searchParams.append('autoplay', '1');
-  url.searchParams.append('loop', '1');
-  url.searchParams.append('controls', '0');
-  url.searchParams.append('modestbranding', '1');
-  url.searchParams.append('rel', '0');
+  url.searchParams.append('autoplay', '1')
+  url.searchParams.append('loop', '1')
+  url.searchParams.append('controls', '0')
+  url.searchParams.append('modestbranding', '1')
+  url.searchParams.append('rel', '0')
 
   return url
 })
 
 function setVideoEmbedMode() {
-  document.documentElement.classList.add('video-embed-mode');
-  document.getElementById("app")?.classList.add('video-embed-mode');
-  document.getElementsByTagName('header')[0]?.classList.add('video-embed-mode');
+  document.documentElement.classList.add('video-embed-mode')
+  document.getElementById('app')?.classList.add('video-embed-mode')
+  document.getElementsByTagName('header')[0]?.classList.add('video-embed-mode')
 }
 
 function unsetVideoEmbedMode() {
   document.documentElement.classList.remove('video-embed-mode')
-  document.getElementById("app")?.classList.remove('video-embed-mode');
-  document.getElementsByTagName('header')[0]?.classList.remove('video-embed-mode');
+  document.getElementById('app')?.classList.remove('video-embed-mode')
+  document.getElementsByTagName('header')[0]?.classList.remove('video-embed-mode')
 }
 
 async function fetchData() {
-  if(!proposal.value && proposalUuid) { await store.fetchProposal(proposalUuid); }
-  if(!title.value && proposal.value?.tconst) { await store.fetchTitle(proposal.value.tconst); }
-  if(!searchSession.value && proposal.value?.search_session_uuid) { await store.fetchSearchSession(proposal.value.search_session_uuid); }
+  if (!proposal.value && proposalUuid) {
+    await store.fetchProposal(proposalUuid)
+  }
+  if (!title.value && proposal.value?.tconst) {
+    await store.fetchTitle(proposal.value.tconst)
+  }
+  if (!searchSession.value && proposal.value?.search_session_uuid) {
+    await store.fetchSearchSession(proposal.value.search_session_uuid)
+  }
 }
 
 async function accept() {
-  await store.updateProposal(proposal.value?.uuid, { accepted: true } )
-  await store.updateSearchSession(searchSession.value?.uuid, { tconst_chosen: title.value?.tconst } )
+  await store.updateProposal(proposal.value?.uuid, { accepted: true })
+  await store.updateSearchSession(searchSession.value?.uuid, { tconst_chosen: title.value?.tconst })
 }
 
 async function reject() {
-  await store.updateProposal(proposal.value?.uuid, { accepted: false } )
+  await store.updateProposal(proposal.value?.uuid, { accepted: false })
 }
 
 async function rejectFeeback(feedback: string) {
-  await store.updateProposal(proposal.value?.uuid, { rejected_feedback: feedback } )
-  await createNewProposal();
+  await store.updateProposal(proposal.value?.uuid, { rejected_feedback: feedback })
+  await createNewProposal()
 }
 
 async function alreadySeen() {
-  await store.updateProposal(proposal.value?.uuid, { already_seen: true, accepted: false } )
+  await store.updateProposal(proposal.value?.uuid, { already_seen: true, accepted: false })
 }
 
 async function alreadySeenFeedback(feedback: string) {
-  await store.updateProposal(proposal.value?.uuid, { already_seen_feedback: feedback } )
-  await createNewProposal();
+  await store.updateProposal(proposal.value?.uuid, { already_seen_feedback: feedback })
+  await createNewProposal()
 }
 
 async function createNewProposal() {
-  const newProposalUuid = await store.createProposal(searchSession.value?.uuid);
-  await router.push({ name: 'proposal', params: { uuid: newProposalUuid }})
+  const newProposalUuid = await store.createProposal(searchSession.value?.uuid)
+  await router.push({ name: 'proposal', params: { uuid: newProposalUuid } })
   router.go(0) // force page reload
 }
 </script>
@@ -98,7 +104,8 @@ async function createNewProposal() {
       :src="youtubeEmbedUrl?.toString()"
       title="Trailer"
       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-      allowfullscreen>
+      allowfullscreen
+    >
     </iframe>
 
     <div class="title-infos">
@@ -110,9 +117,7 @@ async function createNewProposal() {
     </div>
 
     <div class="proposal-actions">
-      <div v-if="proposal?.accepted">
-        🎉
-      </div>
+      <div v-if="proposal?.accepted">🎉</div>
       <div v-else-if="proposal?.already_seen">
         <div>I've already seen it...</div>
         <button v-for="feedback in proposalAlreadySeenFeedback" :key="feedback" @click="alreadySeenFeedback(feedback)">
@@ -137,11 +142,11 @@ async function createNewProposal() {
 
 <style scoped>
 .iframe-video-embed {
- display: block;
- width: 100%;
- border: none;
- overflow-y: auto;
- overflow-x: hidden;
+  display: block;
+  width: 100%;
+  border: none;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .title-infos {

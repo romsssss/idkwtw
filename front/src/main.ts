@@ -10,29 +10,30 @@ import router from './router'
 const messages = {
   en: {
     general: {
-      next: "Next",
+      next: 'Next'
     },
     home: {
       title: "I Don't Know What To Watch",
-      subtitle: "Movie recommendation engine",
-      tagline: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-      ctaLabel: "Find a movie",
+      subtitle: 'Movie recommendation engine',
+      tagline:
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+      ctaLabel: 'Find a movie'
     },
     searchSession: {
       public: {
-        title: "Who are you watching with ?",
+        title: 'Who are you watching with ?',
         label: {
-          alone: "By myself",
-          date: "With a date",
-          partner: "With my partner",
-          kids: "With kids",
-          friends: "With friends",
-          family: "With family or relatives",
+          alone: 'By myself',
+          date: 'With a date',
+          partner: 'With my partner',
+          kids: 'With kids',
+          friends: 'With friends',
+          family: 'With family or relatives'
         }
       },
       genres: {
-        title: "What kind of film are you in ?",
-        subtitle: "Multiple answers are possible",
+        title: 'What kind of film are you in ?',
+        subtitle: 'Multiple answers are possible',
         label: {
           Drama: 'Drama',
           Documentary: 'Documentary',
@@ -54,7 +55,7 @@ const messages = {
           Animation: 'Animation',
           Sport: 'Sport',
           'Sci-Fi': 'Sci-Fi',
-          Western: 'Western',
+          Western: 'Western'
         },
         icon: {
           Drama: 'fa-masks-theater',
@@ -77,12 +78,12 @@ const messages = {
           Animation: 'fa-palette',
           Sport: 'fa-futbol',
           'Sci-Fi': 'fa-robot',
-          Western: 'fa-hat-cowboy',
+          Western: 'fa-hat-cowboy'
         }
       },
-      startSearching: "Start searching",
+      startSearching: 'Start searching'
     }
-  },
+  }
 }
 
 const app = createApp(App)
