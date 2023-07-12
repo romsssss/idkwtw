@@ -4,8 +4,8 @@ import { RouterLink, RouterView } from 'vue-router';
 
 <template>
   <header>
-    <router-link to="/" custom v-slot="{ navigate }">
-      <button @click="navigate" role="link" class="btn btn-logo">
+    <router-link v-slot="{ navigate }" to="/" custom>
+      <button role="link" class="btn btn-logo" @click="navigate">
         IDKWTW
       </button>
     </router-link>

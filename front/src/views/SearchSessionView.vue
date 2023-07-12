@@ -77,7 +77,7 @@ function setMode(m: string) {
           <div class="option">
             <label :for="item">
               <span>{{ $t(`searchSession.public.label.${item}`) }}</span>
-              <input type="radio" name="public" :id="item" :value="item" :checked="searchSession?.public === item" @change="savePublic(item)"/>
+              <input :id="item" type="radio" name="public" :value="item" :checked="searchSession?.public === item" @change="savePublic(item)"/>
               <i class="fa-solid fa-check"></i>
             </label>
           </div>
@@ -106,7 +106,7 @@ function setMode(m: string) {
                 <i v-if="$t(`searchSession.genres.icon.${genre}`)" class="fa-solid" :class="$t(`searchSession.genres.icon.${genre}`)"></i>
                 {{ $t(`searchSession.genres.label.${genre}`) }}
               </span>
-              <input type="checkbox" name="genres" :id="genre" :value="genre" :checked="searchSession?.genres && searchSession?.genres.includes(genre)" @change="saveGenres()">
+              <input :id="genre" type="checkbox" name="genres" :value="genre" :checked="searchSession?.genres && searchSession?.genres.includes(genre)" @change="saveGenres()">
               <i class="fa-solid fa-check"></i>
             </label>
           </div>
