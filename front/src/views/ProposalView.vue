@@ -124,7 +124,7 @@ async function createNewProposal() {
         <button
           v-for="feedback in proposalAlreadySeenFeedback"
           :key="feedback"
-          class="btn btn-secondary-action"
+          class="btn btn-option"
           @click="alreadySeenFeedback(feedback)"
         >
           {{ $t(`proposal.alreadySeenFeedback.${feedback}`) }}
@@ -135,19 +135,19 @@ async function createNewProposal() {
         <button
           v-for="feedback in proposalRejectedFeedback"
           :key="feedback"
-          class="btn btn-secondary-action"
+          class="btn btn-option"
           @click="rejectFeeback(feedback)"
         >
           {{ $t(`proposal.rejectedFeedback.${feedback}`) }}
         </button>
-        <button class="btn btn-secondary-action" @click="createNewProposal">
+        <button class="btn btn-option" @click="createNewProposal">
           {{ $t('proposal.just_skip') }}
         </button>
       </div>
       <div v-else class="main-actions">
-        <button class="btn btn-main-action" @click="accept">{{ $t('proposal.watchNow') }}</button>
-        <button class="btn btn-main-action" @click="reject">{{ $t('proposal.skip') }}</button>
-        <button class="btn btn-main-action" @click="alreadySeen">{{ $t('proposal.seenItAlready') }}</button>
+        <button class="btn btn-option uppercase" @click="accept">{{ $t('proposal.watchNow') }}</button>
+        <button class="btn btn-option uppercase" @click="reject">{{ $t('proposal.skip') }}</button>
+        <button class="btn btn-option uppercase" @click="alreadySeen">{{ $t('proposal.seenItAlready') }}</button>
       </div>
     </div>
   </main>
@@ -190,33 +190,13 @@ async function createNewProposal() {
   text-align: right;
 }
 
-/* .main-actions {
-  display: flex;
-  gap: 10px;
-} */
 .secondary-action-title {
   text-align: center;
   text-decoration: underline;
   text-transform: uppercase;
 }
 
-.btn-main-action {
+.uppercase {
   text-transform: uppercase;
-}
-
-.btn-main-action,
-.btn-secondary-action {
-  color: var(--color-primary);
-  border-radius: 4px;
-  border: 0.5px solid var(--color-text-dark-1);
-  margin: 5px 5px;
-  cursor: pointer;
-  padding: 10px;
-}
-
-.btn-main-action:hover,
-.btn-secondary-action:hover {
-  border-color: var(--color-secondary);
-  background-color: var(--color-secondary);
 }
 </style>
