@@ -82,6 +82,23 @@ const messages = {
         }
       },
       startSearching: 'Start searching'
+    },
+    proposal: {
+      skip: 'Skip',
+      watchNow: 'Watch now',
+      seenItAlready: 'Seen it already',
+      just_skip: 'Just skip',
+      alreadySeenFeedback: {
+        liked: 'Liked it',
+        disliked: "Dind't like it",
+        do_not_remember: "Don't remember"
+      },
+      rejectedFeedback: {
+        too_long: 'Too long',
+        too_old: 'Too old',
+        too_violent: 'Too violent',
+        too_scary: 'Too scary'
+      }
     }
   }
 }

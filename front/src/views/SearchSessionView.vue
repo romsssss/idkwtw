@@ -75,7 +75,7 @@ function setMode(m: string) {
       <div class="subtitle"></div>
       <div class="form-container">
         <div v-for="item in searchSessionPublics" :key="item" class="option-wrapper-full-width">
-          <div class="option">
+          <div class="btn btn-option">
             <label :for="item">
               <span>{{ $t(`searchSession.public.label.${item}`) }}</span>
               <input
@@ -108,7 +108,7 @@ function setMode(m: string) {
       </div>
       <div class="form-container">
         <div v-for="genre in genres" :key="genre" class="option-wrapper-half-width">
-          <div class="option">
+          <div class="btn btn-option">
             <label :for="genre">
               <span>
                 <i
@@ -161,47 +161,6 @@ function setMode(m: string) {
 .option-wrapper-full-width {
   flex: 100%;
   flex-grow: 0;
-}
-
-.option {
-  border-radius: 4px;
-  border: 0.5px solid var(--color-text-dark-1);
-  margin: 5px 5px;
-}
-.option label {
-  display: flex;
-  justify-content: space-between;
-  cursor: pointer;
-  padding: 10px;
-}
-
-.option:has(input[type='checkbox']:checked),
-.option:has(input[type='radio']:checked),
-.option:hover {
-  border-color: var(--color-secondary);
-}
-.option label:has(input[type='checkbox']:checked),
-.option label:has(input[type='radio']:checked),
-label:hover {
-  background-color: var(--color-secondary);
-}
-
-.option label input[type='checkbox'],
-.option label input[type='radio'] {
-  display: none;
-}
-.option label input[type='checkbox'] + .fa-check,
-.option label input[type='radio'] + .fa-check {
-  display: none;
-}
-
-.option label input[type='checkbox']:checked + .fa-check,
-.option label input[type='radio']:checked + .fa-check {
-  display: var(--fa-display, inline-block);
-}
-
-.option label .fa-solid {
-  margin-right: 5px;
 }
 .cta-wrapper {
   text-align: center;

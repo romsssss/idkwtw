@@ -109,8 +109,9 @@ async function createNewProposal() {
     </iframe>
 
     <div class="title-infos">
-      <h2>{{ title?.primary_title }}</h2>
-      <h3>
+      <div class="title-genres">{{ title?.genres.join(', ') }}</div>
+      <h2 class="title">{{ title?.primary_title }}</h2>
+      <h3 class="subtitle">
         {{ title?.start_year }}
         <span v-if="title?.runtime_minutes">- {{ title?.runtime_minutes }}min</span>
       </h3>
@@ -119,22 +120,34 @@ async function createNewProposal() {
     <div class="proposal-actions">
       <div v-if="proposal?.accepted">🎉</div>
       <div v-else-if="proposal?.already_seen">
-        <div>I've already seen it...</div>
-        <button v-for="feedback in proposalAlreadySeenFeedback" :key="feedback" @click="alreadySeenFeedback(feedback)">
-          {{ feedback }}
+        <div class="secondary-action-title">{{ $t('proposal.seenItAlready') }}</div>
+        <button
+          v-for="feedback in proposalAlreadySeenFeedback"
+          :key="feedback"
+          class="btn btn-option"
+          @click="alreadySeenFeedback(feedback)"
+        >
+          {{ $t(`proposal.alreadySeenFeedback.${feedback}`) }}
         </button>
       </div>
       <div v-else-if="proposal?.accepted === false">
-        <div>Nope, show me something else...</div>
-        <button v-for="feedback in proposalRejectedFeedback" :key="feedback" @click="rejectFeeback(feedback)">
-          {{ feedback }}
+        <div class="secondary-action-title">{{ $t('proposal.skip') }}</div>
+        <button
+          v-for="feedback in proposalRejectedFeedback"
+          :key="feedback"
+          class="btn btn-option"
+          @click="rejectFeeback(feedback)"
+        >
+          {{ $t(`proposal.rejectedFeedback.${feedback}`) }}
         </button>
-        <button @click="createNewProposal">...don't know why but no</button><br />
+        <button class="btn btn-option" @click="createNewProposal">
+          {{ $t('proposal.just_skip') }}
+        </button>
       </div>
-      <div v-else>
-        <button @click="accept">That's the one !</button><br />
-        <button @click="reject">Nope, show me something else</button><br />
-        <button @click="alreadySeen">I've already seen it</button><br />
+      <div v-else class="main-actions">
+        <button class="btn btn-option uppercase" @click="accept">{{ $t('proposal.watchNow') }}</button>
+        <button class="btn btn-option uppercase" @click="reject">{{ $t('proposal.skip') }}</button>
+        <button class="btn btn-option uppercase" @click="alreadySeen">{{ $t('proposal.seenItAlready') }}</button>
       </div>
     </div>
   </main>
@@ -150,18 +163,40 @@ async function createNewProposal() {
 }
 
 .title-infos {
-  border: 2px solid white;
   position: absolute;
   bottom: 0;
   left: 0;
-  padding: 30px;
+  padding: 10px 30px 50px 30px;
+}
+
+.title-genres {
+  font-size: 0.8em;
+  font-style: italic;
+  color: var(--color-text-dark-1);
+}
+.title {
+  font-size: 2em;
+}
+.subtitle {
+  font-size: 1em;
+  color: var(--color-text-dark-1);
 }
 
 .proposal-actions {
-  border: 2px solid white;
   position: absolute;
-  bottom: 0;
+  top: 100px;
   right: 0;
-  padding: 30px;
+  padding: 10px 30px 10px 30px;
+  text-align: right;
+}
+
+.secondary-action-title {
+  text-align: center;
+  text-decoration: underline;
+  text-transform: uppercase;
+}
+
+.uppercase {
+  text-transform: uppercase;
 }
 </style>
