@@ -24,7 +24,7 @@ class VideoCreatorService {
       if (video) { throw new Error(`Title ${title.tconst} already has a video of type ${this.videoType}`) }
 
       // Get trailer video from The Movie DB
-      const result = await this._lookupTrailerOnTheMovieDB()
+      const result = await this.#lookupTrailerOnTheMovieDB()
       if (result === undefined) { throw new Error(`No video found on The Movie DB for title ${title.tconst}`) }
 
       const videoParams = {
@@ -47,7 +47,7 @@ class VideoCreatorService {
     }
   }
 
-  async _lookupTrailerOnTheMovieDB () {
+  async #lookupTrailerOnTheMovieDB () {
     const requestOptions = {
       method: 'GET',
       redirect: 'follow'
