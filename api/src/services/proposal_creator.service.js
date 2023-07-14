@@ -24,6 +24,11 @@ class ProposalCreatorService {
       do {
         attempts += 1
         title = await this.#pickTitle(searchSession)
+
+        if (!title) {
+          return { success: false, error: { message: 'No title available' } }
+        }
+
         if (!title.video) {
           const videoCreatorServiceInstance = new VideoCreatorService(title.tconst)
           videoCreatorServiceRes = await videoCreatorServiceInstance.perform()
