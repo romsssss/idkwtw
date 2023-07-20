@@ -16,7 +16,7 @@ const messages = {
       title: "I Don't Know What To Watch",
       subtitle: 'Movie recommendation engine',
       tagline:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+        "You can't find anyththing to watch tonight ? Answer 2 simple questions and the engine will start showing you movie trailers !",
       ctaLabel: 'Find a movie'
     },
     searchSession: {
