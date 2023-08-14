@@ -3,7 +3,7 @@ import type { SearchSession } from '@/models/search_session.model'
 import type { Proposal } from '@/models/proposal.model'
 import type { Title } from '@/models/title.model'
 
-const apiBaseUrl = 'http://127.0.0.1:3000'
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
 
 export const mainStore = defineStore('main_store', {
   state: () => ({
