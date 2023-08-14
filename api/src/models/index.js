@@ -5,10 +5,10 @@ const sequelize = new Sequelize(dbConfig.DATABASE, dbConfig.USER, dbConfig.PASSW
   host: dbConfig.HOST,
   dialect: dbConfig.DIALECT,
   dialectModule: require('pg'),
-  logging: process.env.NODE_ENV === 'development',
-  ssl: {
-    require: true
+  dialectOptions: {
+    ssl: true
   },
+  logging: process.env.NODE_ENV === 'development',
   pool: {
     max: dbConfig.POOL.max,
     min: dbConfig.POOL.min,
