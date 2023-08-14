@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { onMounted, computed, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { mainStore } from '@/stores/main'
@@ -7,6 +8,7 @@ import { searchSessionPublics } from '@/models/search_session.model'
 const router = useRouter()
 const route = useRoute()
 const store = mainStore()
+const { t } = useI18n()
 
 const mode = ref('public')
 
@@ -70,14 +72,14 @@ function setMode(m: string) {
   <main class="main-flex">
     <div v-if="mode === 'public'" class="main-flex-content">
       <h2 class="title">
-        {{ $t('searchSession.public.title') }}
+        {{ t('searchSession.public.title') }}
       </h2>
       <div class="subtitle"></div>
       <div class="form-container">
         <div v-for="item in searchSessionPublics" :key="item" class="option-wrapper-full-width">
           <div class="btn btn-option">
             <label :for="item">
-              <span>{{ $t(`searchSession.public.label.${item}`) }}</span>
+              <span>{{ t(`searchSession.public.label.${item}`) }}</span>
               <input
                 :id="item"
                 type="radio"
@@ -93,7 +95,7 @@ function setMode(m: string) {
       </div>
       <div class="cta-wrapper">
         <button class="btn btn-cta" role="link" @click="setMode('genres')">
-          {{ $t('general.next') }}
+          {{ t('general.next') }}
           <i class="fa-solid fa-arrow-right"></i>
         </button>
       </div>
@@ -101,10 +103,10 @@ function setMode(m: string) {
 
     <div v-if="mode === 'genres'" class="main-flex-content">
       <h2 class="title">
-        {{ $t('searchSession.genres.title') }}
+        {{ t('searchSession.genres.title') }}
       </h2>
       <div class="subtitle">
-        {{ $t('searchSession.genres.subtitle') }}
+        {{ t('searchSession.genres.subtitle') }}
       </div>
       <div class="form-container">
         <div v-for="genre in genres" :key="genre" class="option-wrapper-half-width">
@@ -112,11 +114,11 @@ function setMode(m: string) {
             <label :for="genre">
               <span>
                 <i
-                  v-if="$t(`searchSession.genres.icon.${genre}`)"
+                  v-if="t(`searchSession.genres.icon.${genre}`)"
                   class="fa-solid"
-                  :class="$t(`searchSession.genres.icon.${genre}`)"
+                  :class="t(`searchSession.genres.icon.${genre}`)"
                 ></i>
-                {{ $t(`searchSession.genres.label.${genre}`) }}
+                {{ t(`searchSession.genres.label.${genre}`) }}
               </span>
               <input
                 :id="genre"
@@ -133,7 +135,7 @@ function setMode(m: string) {
       </div>
       <div class="cta-wrapper">
         <button class="btn btn-cta" role="link" @click="startProposals">
-          {{ $t('searchSession.startSearching') }}
+          {{ t('searchSession.startSearching') }}
           <i class="fa-solid fa-arrow-right"></i>
         </button>
       </div>

@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { mainStore } from '@/stores/main'
 
 const router = useRouter()
 const store = mainStore()
+const { t } = useI18n()
 
 async function findMovie() {
   const newSearchSessionUuid = await store.createSearchSession()
@@ -14,12 +16,12 @@ async function findMovie() {
 <template>
   <main class="main-flex">
     <div class="main-flex-content">
-      <div class="subtitle">{{ $t('home.subtitle') }}</div>
-      <h1 class="title">{{ $t('home.title') }}</h1>
-      <div class="tagline">{{ $t('home.tagline') }}</div>
+      <div class="subtitle">{{ t('home.subtitle') }}</div>
+      <h1 class="title">{{ t('home.title') }}</h1>
+      <div class="tagline">{{ t('home.tagline') }}</div>
       <div class="cta-wrapper">
         <button class="btn btn-cta" role="link" @click="findMovie">
-          {{ $t('home.ctaLabel') }}
+          {{ t('home.ctaLabel') }}
           <i class="fa-solid fa-arrow-right"></i>
         </button>
       </div>
