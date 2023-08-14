@@ -2,16 +2,15 @@ const dbConfig = require('../../config/db.config.js')
 
 const Sequelize = require('sequelize')
 const sequelize = new Sequelize(dbConfig.DATABASE, dbConfig.USER, dbConfig.PASSWORD, {
-  // host: dbConfig.HOST,
+  host: dbConfig.HOST,
   dialect: dbConfig.DIALECT,
-  // dialectModule: require('pg'),
-  // ssl: true,
-  // dialectOptions: {
-  //   ssl: {
-  //     require: true,
-  //     rejectUnauthorized: false
-  //   }
-  // },
+  dialectModule: require('pg'),
+  dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false
+    }
+  },
   logging: process.env.NODE_ENV === 'development',
   pool: {
     max: dbConfig.POOL.max,
