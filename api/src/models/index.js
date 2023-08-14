@@ -6,7 +6,9 @@ const sequelize = new Sequelize(dbConfig.DATABASE, dbConfig.USER, dbConfig.PASSW
   dialect: dbConfig.DIALECT,
   dialectModule: require('pg'),
   dialectOptions: {
-    rejectUnauthorized: false
+    ssl: {
+      rejectUnauthorized: false
+    }
   },
   logging: process.env.NODE_ENV === 'development',
   pool: {
