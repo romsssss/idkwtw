@@ -37,6 +37,12 @@ const youtubeEmbedUrl = computed(() => {
   return url
 })
 
+const imdbUrl = computed(() => {
+  let url = new URL(`https://www.imdb.com/title/${title.value.tconst}`)
+
+  return url
+})
+
 function setVideoEmbedMode() {
   document.documentElement.classList.add('video-embed-mode')
   document.getElementById('app')?.classList.add('video-embed-mode')
@@ -64,6 +70,7 @@ async function fetchData() {
 async function accept() {
   await store.updateProposal(proposal.value?.uuid, { accepted: true })
   await store.updateSearchSession(searchSession.value?.uuid, { tconst_chosen: title.value?.tconst })
+  window.location.href = imdbUrl.value.toString()
 }
 
 async function reject() {
