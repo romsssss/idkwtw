@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { onMounted, onUnmounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { mainStore } from '@/stores/main'
@@ -7,6 +8,7 @@ import { proposalRejectedFeedback, proposalAlreadySeenFeedback } from '@/models/
 const router = useRouter()
 const route = useRoute()
 const store = mainStore()
+const { t } = useI18n()
 
 let proposalUuid = route.params.uuid as string
 const proposal = computed(() => store.getProposalByUuid(proposalUuid))
@@ -38,7 +40,7 @@ const youtubeEmbedUrl = computed(() => {
 })
 
 const imdbUrl = computed(() => {
-  let url = new URL(`https://www.imdb.com/title/${title.value.tconst}`)
+  let url = new URL(`https://www.imdb.com/title/${title.value?.tconst}`)
 
   return url
 })
@@ -127,34 +129,34 @@ async function createNewProposal() {
     <div class="proposal-actions">
       <div v-if="proposal?.accepted">🎉</div>
       <div v-else-if="proposal?.already_seen">
-        <div class="secondary-action-title">{{ $t('proposal.seenItAlready') }}</div>
+        <div class="secondary-action-title">{{ t('proposal.seenItAlready') }}</div>
         <button
           v-for="feedback in proposalAlreadySeenFeedback"
           :key="feedback"
           class="btn btn-option"
           @click="alreadySeenFeedback(feedback)"
         >
-          {{ $t(`proposal.alreadySeenFeedback.${feedback}`) }}
+          {{ t(`proposal.alreadySeenFeedback.${feedback}`) }}
         </button>
       </div>
       <div v-else-if="proposal?.accepted === false">
-        <div class="secondary-action-title">{{ $t('proposal.skip') }}</div>
+        <div class="secondary-action-title">{{ t('proposal.skip') }}</div>
         <button
           v-for="feedback in proposalRejectedFeedback"
           :key="feedback"
           class="btn btn-option"
           @click="rejectFeeback(feedback)"
         >
-          {{ $t(`proposal.rejectedFeedback.${feedback}`) }}
+          {{ t(`proposal.rejectedFeedback.${feedback}`) }}
         </button>
         <button class="btn btn-option" @click="createNewProposal">
-          {{ $t('proposal.just_skip') }}
+          {{ t('proposal.just_skip') }}
         </button>
       </div>
       <div v-else class="main-actions">
-        <button class="btn btn-option uppercase" @click="accept">{{ $t('proposal.watchNow') }}</button>
-        <button class="btn btn-option uppercase" @click="reject">{{ $t('proposal.skip') }}</button>
-        <button class="btn btn-option uppercase" @click="alreadySeen">{{ $t('proposal.seenItAlready') }}</button>
+        <button class="btn btn-option uppercase" @click="accept">{{ t('proposal.watchNow') }}</button>
+        <button class="btn btn-option uppercase" @click="reject">{{ t('proposal.skip') }}</button>
+        <button class="btn btn-option uppercase" @click="alreadySeen">{{ t('proposal.seenItAlready') }}</button>
       </div>
     </div>
   </main>
