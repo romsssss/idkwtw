@@ -18,16 +18,16 @@ npm install
 
 Add required ENV variables in a `.env.development` file
 
-* `DB_HOST`
-* `DB_USER`
-* `DB_PASSWORD`
-* `DB_NAME`
+* `POSTGRES_HOST`
+* `POSTGRES_USER`
+* `POSTGRES_PASSWORD`
+* `POSTGRES_DATABASE`
 
 Create and seed the database
 
 ```bash
-psql -U $DB_USER -d $DB_NAME < data/schema.sql
-psql -U $DB_USER -d $DB_NAME < data/seed.sql
+psql -U $POSTGRES_USER -d $POSTGRES_DATABASE < data/schema.sql
+psql -U $POSTGRES_USER -d $POSTGRES_DATABASE < data/seed.sql
 ```
 
 ## Run project
