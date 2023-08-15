@@ -1,6 +1,6 @@
 # IDKWTW
 
-_I Don't Know What To Watch_, is a minimalist movie recommendation system.
+[I Don't Know What To Watch](https://idontknowwhattowatch.com), is a minimalist movie recommendation system.
 
 ## Getting started
 
