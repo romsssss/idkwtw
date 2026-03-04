@@ -62,3 +62,14 @@ The following command will cleanup `imdb_datasets` schema from any inconsistent 
 ```bash
 psql $POSTGRES_CONNECTION_URI < database/cleanup.sql
 ```
+
+### STEP 5: transfer titles to production
+
+Run the following command to populate the `public.titles` table in the production (Vercel/Neon) database.
+Existing rows are silently skipped; `proposals` and `videos` are never touched.
+
+```bash
+LOCAL_DB=<local_uri> PROD_DB=<production_uri> bash transfer_titles.sh
+# or, if POSTGRES_CONNECTION_URI is already set in .env:
+source .env && PROD_DB=<production_uri> bash transfer_titles.sh
+```
