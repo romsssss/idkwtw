@@ -76,6 +76,7 @@ describe('#create', () => {
 
     beforeEach(async () => {
       searchSession = await SearchSession.create()
+      await Title.create({ tconst: `tt${crypto.randomBytes(4).toString('hex')}` })
       VideoCreatorService.mockImplementation(() => {
         return {
           perform: () => {
