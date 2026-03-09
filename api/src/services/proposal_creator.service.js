@@ -33,7 +33,7 @@ class ProposalCreatorService {
           const videoCreatorServiceInstance = new VideoCreatorService(title.tconst)
           videoCreatorServiceRes = await videoCreatorServiceInstance.perform()
         }
-      } while (!this.tconst && attempts <= 10 && !videoCreatorServiceRes.success)
+      } while (!this.tconst && attempts <= 10 && !(title.video || videoCreatorServiceRes?.success))
 
       if (!videoCreatorServiceRes.success) { throw videoCreatorServiceRes.error }
 
