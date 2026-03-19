@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node ./bin/www",
     "test": "NODE_ENV=test jest --config=test/jest.config.js --randomize",
-    "lint": "eslint ./"
+    "lint": "eslint"
   },
   "dependencies": {
     "cookie-parser": "~1.4.7",
@@ -20,12 +20,10 @@
     "sequelize": "^6.29.3"
   },
   "devDependencies": {
-    "eslint": "^8.38.0",
-    "eslint-config-standard": "^17.0.0",
-    "eslint-plugin-import": "^2.27.5",
-    "eslint-plugin-jest": "^27.2.1",
-    "eslint-plugin-n": "^15.7.0",
-    "eslint-plugin-promise": "^6.1.1",
+    "@eslint/js": "^10.0.0",
+    "eslint": "^10.0.0",
+    "eslint-plugin-jest": "^29.15.0",
+    "globals": "^16.1.0",
     "jest": "^30.2.0",
     "supertest": "^7.2.2"
   }
