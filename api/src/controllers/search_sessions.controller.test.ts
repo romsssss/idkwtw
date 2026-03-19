@@ -1,6 +1,7 @@
-const request = require('supertest')
-const app = require('../../app').default
-const db = require('../models').default
+import request from 'supertest'
+import app from '../../app'
+import db from '../models'
+
 const SearchSession = db.search_sessions
 
 describe('#create', () => {
@@ -85,8 +86,8 @@ describe('#findOne', () => {
   })
 
   describe('when a correct uuid is given ', () => {
-    let searchSession
-    let uuid
+    let searchSession: Awaited<ReturnType<typeof SearchSession.create>>
+    let uuid: string
 
     beforeEach(async () => {
       searchSession = await SearchSession.create()
@@ -153,8 +154,8 @@ describe('#update ', () => {
   })
 
   describe('when a correct uuid is given ', () => {
-    let searchSession
-    let uuid
+    let searchSession: Awaited<ReturnType<typeof SearchSession.create>>
+    let uuid: string
 
     beforeEach(async () => {
       searchSession = await SearchSession.create({ public: 'kids' })

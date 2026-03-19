@@ -1,5 +1,5 @@
-const request = require('supertest')
-const app = require('../../app').default
+import request from 'supertest'
+import app from '../../app'
 
 describe('#ping ', () => {
   test('returns a 200 status code', () => {

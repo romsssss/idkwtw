@@ -1,6 +1,7 @@
-const VideoCreatorService = require('./video_creator.service').default
-const crypto = require('crypto')
-const db = require('../models').default
+import VideoCreatorService from './video_creator.service'
+import crypto from 'crypto'
+import db from '../models'
+
 const Title = db.titles
 const Video = db.videos
 
@@ -19,12 +20,13 @@ describe('#perform', () => {
       const VideoCreatorServiceInstance = new VideoCreatorService(unknownTconst)
       const res = await VideoCreatorServiceInstance.perform()
 
+      if (res.success) throw new Error('Expected failure')
       expect(res.error.message).toEqual('Title not found')
     })
   })
 
   describe('when title exists', () => {
-    let title
+    let title: { tconst: string }
 
     beforeEach(async () => {
       title = await Title.create({ tconst: `tt${crypto.randomBytes(4).toString('hex')}` })
@@ -46,6 +48,7 @@ describe('#perform', () => {
         const VideoCreatorServiceInstance = new VideoCreatorService(title.tconst)
         const res = await VideoCreatorServiceInstance.perform()
 
+        if (res.success) throw new Error('Expected failure')
         expect(res.error.message).toEqual(expect.stringContaining('already has a video of type trailer'))
       })
     })
@@ -56,8 +59,8 @@ describe('#perform', () => {
           Promise.resolve({
             json: () => Promise.resolve({ results: [] })
           })
-        )
-        fetch.mockClear()
+        ) as unknown as typeof fetch;
+        (global.fetch as jest.Mock).mockClear()
       })
 
       test('returns success false', async () => {
@@ -71,6 +74,7 @@ describe('#perform', () => {
         const VideoCreatorServiceInstance = new VideoCreatorService(title.tconst)
         const res = await VideoCreatorServiceInstance.perform()
 
+        if (res.success) throw new Error('Expected failure')
         expect(res.error.message).toEqual(expect.stringContaining('No video found on The Movie DB'))
       })
     })
@@ -116,8 +120,8 @@ describe('#perform', () => {
               }]
             })
           })
-        )
-        fetch.mockClear()
+        ) as unknown as typeof fetch;
+        (global.fetch as jest.Mock).mockClear()
       })
 
       test('returns success true', async () => {
@@ -131,6 +135,7 @@ describe('#perform', () => {
         const VideoCreatorServiceInstance = new VideoCreatorService(title.tconst)
         const res = await VideoCreatorServiceInstance.perform()
 
+        if (!res.success) throw new Error('Expected success')
         expect(res.body).toBeInstanceOf(Video)
         expect(res.body.tconst).not.toBeNull()
         expect(res.body.key).toEqual('BdJKm16Co6M')

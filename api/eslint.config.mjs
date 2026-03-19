@@ -16,7 +16,7 @@ export default [
   ...tseslint.configs.recommended,
   {
     name: 'app/jest',
-    files: ['src/**/*.test.js', 'jest.setup.js'],
+    files: ['src/**/*.test.ts', 'jest.setup.ts'],
     ...jest.configs['flat/recommended'],
     rules: {
       ...jest.configs['flat/recommended'].rules,

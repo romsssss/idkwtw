@@ -29,6 +29,7 @@
     "@types/debug": "^4.1.13",
     "@types/express": "^5.0.6",
     "@types/http-errors": "^2.0.5",
+    "@types/jest": "^30.0.0",
     "@types/morgan": "^1.9.10",
     "@types/node": "^25.5.0",
     "@types/pg": "^8.18.0",

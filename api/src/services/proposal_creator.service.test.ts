@@ -2,10 +2,12 @@ jest.mock('./video_creator.service', () => ({
   __esModule: true,
   default: jest.fn()
 }))
-const ProposalCreatorService = require('./proposal_creator.service').default
-const crypto = require('crypto')
-const VideoCreatorService = require('./video_creator.service').default
-const db = require('../models').default
+import ProposalCreatorService from './proposal_creator.service'
+import crypto from 'crypto'
+import VideoCreatorService from './video_creator.service'
+import db from '../models'
+
+const MockedVCS = VideoCreatorService as jest.Mock
 const SearchSession = db.search_sessions
 const Proposal = db.proposals
 const Title = db.titles
@@ -25,13 +27,14 @@ describe('#perform', () => {
       const proposalCreatorServiceInstance = new ProposalCreatorService(unknownSearchSessionUUID)
       const res = await proposalCreatorServiceInstance.perform()
 
+      if (res.success) throw new Error('Expected failure')
       expect(res.error.message).toEqual('Search Session not found')
     })
   })
 
   describe('when search session exist', () => {
-    let searchSession
-    let title
+    let searchSession: Awaited<ReturnType<typeof SearchSession.create>>
+    let title: Awaited<ReturnType<typeof Title.create>>
 
     beforeEach(async () => {
       searchSession = await SearchSession.create()
@@ -40,7 +43,7 @@ describe('#perform', () => {
 
     describe('when everythig goes fine', () => {
       beforeEach(async () => {
-        VideoCreatorService.mockImplementation(() => {
+        MockedVCS.mockImplementation(() => {
           return {
             perform: () => {
               return { success: true, body: {} }
@@ -60,6 +63,7 @@ describe('#perform', () => {
         const proposalCreatorServiceInstance = new ProposalCreatorService(searchSession.uuid)
         const res = await proposalCreatorServiceInstance.perform()
 
+        if (!res.success) throw new Error('Expected success')
         expect(res.body).toBeInstanceOf(Proposal)
         expect(res.body.search_session_uuid).not.toBeNull()
       })
@@ -67,7 +71,7 @@ describe('#perform', () => {
 
     describe('when trailer video cannot be retrieved', () => {
       beforeEach(() => {
-        VideoCreatorService.mockImplementation(() => {
+        MockedVCS.mockImplementation(() => {
           return {
             perform: () => {
               return { success: false, error: new Error('Oops') }
@@ -87,6 +91,7 @@ describe('#perform', () => {
         const proposalCreatorServiceInstance = new ProposalCreatorService(searchSession.uuid, title.tconst)
         const res = await proposalCreatorServiceInstance.perform()
 
+        if (res.success) throw new Error('Expected failure')
         expect(res.error.message).toEqual('Oops')
       })
     })
