@@ -1,6 +1,7 @@
-const express = require('express')
-const router = express.Router()
-const searchSessions = require('../controllers/search_sessions.controller.js')
+import { Router } from 'express'
+import * as searchSessions from '../controllers/search_sessions.controller'
+
+const router = Router()
 
 // Retrieve a search session
 router.get('/:uuid', searchSessions.findOne)
@@ -11,4 +12,4 @@ router.post('/', searchSessions.create)
 // Update a search session
 router.put('/:uuid', searchSessions.update)
 
-module.exports = router
+export default router

@@ -1,5 +1,5 @@
 const request = require('supertest')
-const app = require('../../app')
+const app = require('../../app').default
 
 describe('#ping ', () => {
   test('returns a 200 status code', () => {

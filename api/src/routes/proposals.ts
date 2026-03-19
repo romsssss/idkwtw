@@ -1,6 +1,7 @@
-const express = require('express')
-const router = express.Router()
-const proposals = require('../controllers/proposals.controller.js')
+import { Router } from 'express'
+import * as proposals from '../controllers/proposals.controller'
+
+const router = Router()
 
 // // Retrieve a list of proposals (for a given session)
 router.get('/', proposals.findAll)
@@ -14,4 +15,4 @@ router.post('/', proposals.create)
 // Update a proposal
 router.put('/:uuid', proposals.update)
 
-module.exports = router
+export default router

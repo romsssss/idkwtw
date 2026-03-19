@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 
+require('tsx/cjs')
+
 /**
  * Module dependencies.
  */
 
-var app = require('../app');
+var app = require('../app').default;
 var debug = require('debug')('webservice:server');
 var http = require('http');
 

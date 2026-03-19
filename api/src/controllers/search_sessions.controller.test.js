@@ -1,6 +1,6 @@
 const request = require('supertest')
-const app = require('../../app')
-const db = require('../models')
+const app = require('../../app').default
+const db = require('../models').default
 const SearchSession = db.search_sessions
 
 describe('#create', () => {

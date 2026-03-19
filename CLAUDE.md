@@ -19,6 +19,7 @@ npm install
 DEBUG=webservice:* NODE_ENV=development npm start
 npm test           # Jest (runs against a real test DB)
 npm run lint       # ESLint
+npm run typecheck  # TypeScript type checking
 ```
 
 ### Frontend (`cd front`)

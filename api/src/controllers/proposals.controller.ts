@@ -1,18 +1,20 @@
-const helper = require('../utils/helper.util')
-const db = require('../models')
+import { Request, Response } from 'express'
+import { isValidUUID } from '../utils/helper.util'
+import db from '../models'
+import ProposalCreatorService from '../services/proposal_creator.service'
+
 const SearchSession = db.search_sessions
 const Proposal = db.proposals
 const Title = db.titles
 const Video = db.videos
-const ProposalCreatorService = require('../services/proposal_creator.service')
 
-exports.create = async (req, res) => {
-  const searchSessionUUID = req.query.search_session_uuid
+export const create = async (req: Request, res: Response): Promise<void> => {
+  const searchSessionUUID = req.query.search_session_uuid as string
 
   if (!searchSessionUUID) {
     res.status(400).send({ message: 'Missing search_session_uuid param' })
     return
-  } else if (!helper.isValidUUID(searchSessionUUID)) {
+  } else if (!isValidUUID(searchSessionUUID)) {
     res.status(400).send({ message: 'Invalid Search Session UUID syntax' })
     return
   }
@@ -31,19 +33,19 @@ exports.create = async (req, res) => {
   if (serviceRes.success) {
     res.status(201).send(serviceRes.body)
   } else {
-    res.status(500).send({ message: serviceRes.error.message })
+    res.status(500).send({ message: (serviceRes.error as Error).message })
   }
 }
 
-exports.findOne = (req, res) => {
-  const uuid = req.params.uuid
+export const findOne = (req: Request, res: Response): void => {
+  const uuid = req.params.uuid as string
 
-  if (!helper.isValidUUID(uuid)) {
+  if (!isValidUUID(uuid)) {
     res.status(400).send({ message: 'Invalid UUID syntax' })
     return
   }
 
-  const includeParam = req.query.include
+  const includeParam = req.query.include as string | undefined
   const includeOptions = includeParam?.includes('title') ? { include: [{ model: Title, include: [Video] }] } : {}
 
   Proposal.findByPk(uuid, includeOptions)
@@ -63,13 +65,13 @@ exports.findOne = (req, res) => {
     })
 }
 
-exports.findAll = async (req, res) => {
-  const searchSessionUUID = req.query.search_session_uuid
+export const findAll = async (req: Request, res: Response): Promise<void> => {
+  const searchSessionUUID = req.query.search_session_uuid as string
 
   if (!searchSessionUUID) {
     res.status(400).send({ message: 'Missing search_session_uuid param' })
     return
-  } else if (!helper.isValidUUID(searchSessionUUID)) {
+  } else if (!isValidUUID(searchSessionUUID)) {
     res.status(400).send({ message: 'Invalid Search Session UUID syntax' })
     return
   }
@@ -82,10 +84,10 @@ exports.findAll = async (req, res) => {
     return
   }
 
-  const includeParam = req.query.include
+  const includeParam = req.query.include as string | undefined
   const includeOptions = includeParam?.includes('title') ? { include: [{ model: Title, include: [Video] }] } : {}
 
-  Proposal.findAll({ where: { search_session_uuid: searchSession.uuid }, ...includeOptions })
+  Proposal.findAll({ where: { search_session_uuid: searchSession.uuid } as never, ...includeOptions })
     .then(proposals => {
       res.send(proposals)
     })
@@ -96,10 +98,10 @@ exports.findAll = async (req, res) => {
     })
 }
 
-exports.update = (req, res) => {
-  const uuid = req.params.uuid
+export const update = (req: Request, res: Response): void => {
+  const uuid = req.params.uuid as string
 
-  if (!helper.isValidUUID(uuid)) {
+  if (!isValidUUID(uuid)) {
     res.status(400).send({ message: 'Invalid UUID syntax' })
     return
   }
@@ -111,7 +113,7 @@ exports.update = (req, res) => {
           .then(proposal => {
             res.send(proposal)
           })
-          .catch(err => {
+          .catch((err: Error & { name: string }) => {
             if (err.name === 'SequelizeDatabaseError') {
               res.status(422).send({
                 message: err.message

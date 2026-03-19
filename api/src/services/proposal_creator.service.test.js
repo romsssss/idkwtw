@@ -1,8 +1,11 @@
-const ProposalCreatorService = require('./proposal_creator.service')
+jest.mock('./video_creator.service', () => ({
+  __esModule: true,
+  default: jest.fn()
+}))
+const ProposalCreatorService = require('./proposal_creator.service').default
 const crypto = require('crypto')
-const VideoCreatorService = require('./video_creator.service')
-jest.mock('./video_creator.service')
-const db = require('../models')
+const VideoCreatorService = require('./video_creator.service').default
+const db = require('../models').default
 const SearchSession = db.search_sessions
 const Proposal = db.proposals
 const Title = db.titles
