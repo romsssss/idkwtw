@@ -14,7 +14,7 @@ export default [
   js.configs.recommended,
   {
     name: 'app/jest',
-    files: ['test/**/*.js'],
+    files: ['src/**/*.test.js', 'jest.setup.js'],
     ...jest.configs['flat/recommended'],
     rules: {
       ...jest.configs['flat/recommended'].rules,

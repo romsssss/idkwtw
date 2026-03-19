@@ -1,9 +1,9 @@
 const request = require('supertest')
 const crypto = require('crypto')
-const VideoCreatorService = require('../../src/services/video_creator.service')
-jest.mock('../../src/services/video_creator.service')
+const VideoCreatorService = require('../services/video_creator.service')
+jest.mock('../services/video_creator.service')
 const app = require('../../app')
-const db = require('../../src/models')
+const db = require('../models')
 const SearchSession = db.search_sessions
 const Title = db.titles
 const Proposal = db.proposals

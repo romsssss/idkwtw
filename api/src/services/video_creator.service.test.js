@@ -1,6 +1,6 @@
-const VideoCreatorService = require('../../src/services/video_creator.service')
+const VideoCreatorService = require('./video_creator.service')
 const crypto = require('crypto')
-const db = require('../../src/models')
+const db = require('../models')
 const Title = db.titles
 const Video = db.videos
 
