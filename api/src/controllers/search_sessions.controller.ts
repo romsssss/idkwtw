@@ -1,9 +1,11 @@
-const helper = require('../utils/helper.util')
-const db = require('../models')
+import { Request, Response } from 'express'
+import { isValidUUID } from '../utils/helper.util'
+import db from '../models'
+
 const SearchSession = db.search_sessions
 const Proposal = db.proposals
 
-exports.create = (req, res) => {
+export const create = (req: Request, res: Response): void => {
   const searchSessionParams = {
     public: req.body.public,
     genres: req.body.genres
@@ -13,7 +15,7 @@ exports.create = (req, res) => {
     .then(data => {
       res.status(201).send(data)
     })
-    .catch(err => {
+    .catch((err: Error & { name: string }) => {
       if (err.name === 'SequelizeDatabaseError') {
         res.status(422).send({
           message: err.message
@@ -27,15 +29,15 @@ exports.create = (req, res) => {
     })
 }
 
-exports.findOne = (req, res) => {
-  const uuid = req.params.uuid
+export const findOne = (req: Request, res: Response): void => {
+  const uuid = req.params.uuid as string
 
-  if (!helper.isValidUUID(uuid)) {
+  if (!isValidUUID(uuid)) {
     res.status(400).send({ message: 'Invalid UUID syntax' })
     return
   }
 
-  const includeParam = req.query.include
+  const includeParam = req.query.include as string | undefined
   const includeOptions = includeParam?.includes('proposals') ? { include: [Proposal] } : {}
 
   SearchSession.findByPk(uuid, includeOptions)
@@ -55,10 +57,10 @@ exports.findOne = (req, res) => {
     })
 }
 
-exports.update = (req, res) => {
-  const uuid = req.params.uuid
+export const update = (req: Request, res: Response): void => {
+  const uuid = req.params.uuid as string
 
-  if (!helper.isValidUUID(uuid)) {
+  if (!isValidUUID(uuid)) {
     res.status(400).send({ message: 'Invalid UUID syntax' })
     return
   }
@@ -70,7 +72,7 @@ exports.update = (req, res) => {
           .then(searchSession => {
             res.send(searchSession)
           })
-          .catch(err => {
+          .catch((err: Error & { name: string }) => {
             if (err.name === 'SequelizeDatabaseError') {
               res.status(422).send({
                 message: err.message

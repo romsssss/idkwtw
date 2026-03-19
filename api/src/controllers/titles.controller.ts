@@ -1,9 +1,11 @@
-const db = require('../models')
+import { Request, Response } from 'express'
+import db from '../models'
+
 const Title = db.titles
 const Video = db.videos
 
-exports.findOne = (req, res) => {
-  const tconst = req.params.tconst
+export const findOne = (req: Request, res: Response): void => {
+  const tconst = req.params.tconst as string
 
   Title.findByPk(tconst, { include: [Video] })
     .then(title => {

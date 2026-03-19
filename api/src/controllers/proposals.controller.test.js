@@ -1,9 +1,12 @@
+jest.mock('../services/video_creator.service', () => ({
+  __esModule: true,
+  default: jest.fn()
+}))
 const request = require('supertest')
 const crypto = require('crypto')
-const VideoCreatorService = require('../services/video_creator.service')
-jest.mock('../services/video_creator.service')
-const app = require('../../app')
-const db = require('../models')
+const VideoCreatorService = require('../services/video_creator.service').default
+const app = require('../../app').default
+const db = require('../models').default
 const SearchSession = db.search_sessions
 const Title = db.titles
 const Proposal = db.proposals
