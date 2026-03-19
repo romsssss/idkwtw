@@ -10,7 +10,7 @@ const route = useRoute()
 const store = mainStore()
 const { t } = useI18n()
 
-let proposalUuid = route.params.uuid as string
+const proposalUuid = route.params.uuid as string
 const proposal = computed(() => store.getProposalByUuid(proposalUuid))
 const title = computed(() => store.getTitleByTconst(proposal.value?.tconst))
 const searchSession = computed(() => store.getSearchSessionByUuid(proposal.value?.search_session_uuid))
@@ -29,7 +29,7 @@ const youtubeEmbedUrl = computed(() => {
     return undefined
   }
 
-  let url = new URL(`https://www.youtube-nocookie.com/embed/${title.value.video.key}`)
+  const url = new URL(`https://www.youtube-nocookie.com/embed/${title.value.video.key}`)
   url.searchParams.append('autoplay', '1')
   url.searchParams.append('loop', '1')
   url.searchParams.append('controls', '0')
@@ -40,7 +40,7 @@ const youtubeEmbedUrl = computed(() => {
 })
 
 const imdbUrl = computed(() => {
-  let url = new URL(`https://www.imdb.com/title/${title.value?.tconst}`)
+  const url = new URL(`https://www.imdb.com/title/${title.value?.tconst}`)
 
   return url
 })
