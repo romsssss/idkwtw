@@ -1,7 +1,7 @@
 const request = require('supertest')
 const crypto = require('crypto')
 const app = require('../../app')
-const db = require('../../src/models')
+const db = require('../models')
 const Title = db.titles
 
 describe('#findOne', () => {

@@ -1,4 +1,4 @@
-const helper = require('../../src/utils/helper.util')
+const helper = require('./helper.util')
 
 describe('Helper Utils', () => {
   describe('isValidUUID', () => {
