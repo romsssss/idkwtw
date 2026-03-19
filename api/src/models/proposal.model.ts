@@ -2,6 +2,7 @@ import { Model, DataTypes, Sequelize, Optional } from 'sequelize'
 
 export interface ProposalAttributes {
   uuid: string
+  search_session_uuid: string
   tconst: string
   accepted: boolean | null
   rejected_feedback: 'too_long' | 'too_old' | 'too_violent' | 'too_scary' | null
@@ -13,6 +14,7 @@ export type ProposalCreationAttributes = Optional<ProposalAttributes, 'uuid' | '
 
 class Proposal extends Model<ProposalAttributes, ProposalCreationAttributes> implements ProposalAttributes {
   declare uuid: string
+  declare search_session_uuid: string
   declare tconst: string
   declare accepted: boolean | null
   declare rejected_feedback: 'too_long' | 'too_old' | 'too_violent' | 'too_scary' | null
@@ -33,6 +35,10 @@ class Proposal extends Model<ProposalAttributes, ProposalCreationAttributes> imp
         allowNull: false,
         unique: true,
         primaryKey: true
+      },
+      search_session_uuid: {
+        type: DataTypes.UUID,
+        allowNull: false
       },
       tconst: {
         type: DataTypes.STRING,

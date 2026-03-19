@@ -2,11 +2,13 @@ jest.mock('../services/video_creator.service', () => ({
   __esModule: true,
   default: jest.fn()
 }))
-const request = require('supertest')
-const crypto = require('crypto')
-const VideoCreatorService = require('../services/video_creator.service').default
-const app = require('../../app').default
-const db = require('../models').default
+import request from 'supertest'
+import crypto from 'crypto'
+import VideoCreatorService from '../services/video_creator.service'
+import app from '../../app'
+import db from '../models'
+
+const MockedVCS = VideoCreatorService as jest.Mock
 const SearchSession = db.search_sessions
 const Title = db.titles
 const Proposal = db.proposals
@@ -75,12 +77,12 @@ describe('#create', () => {
   })
 
   describe('when creation is successful', () => {
-    let searchSession
+    let searchSession: Awaited<ReturnType<typeof SearchSession.create>>
 
     beforeEach(async () => {
       searchSession = await SearchSession.create()
       await Title.create({ tconst: `tt${crypto.randomBytes(4).toString('hex')}` })
-      VideoCreatorService.mockImplementation(() => {
+      MockedVCS.mockImplementation(() => {
         return {
           perform: () => {
             return { success: true, body: {} }
@@ -147,7 +149,7 @@ describe('#findOne', () => {
   })
 
   describe('when a correct uuid is given ', () => {
-    let uuid
+    let uuid: string
 
     beforeEach(async () => {
       const searchSession = await SearchSession.create()
@@ -302,8 +304,8 @@ describe('#update ', () => {
   })
 
   describe('when a correct uuid is given ', () => {
-    let proposal
-    let uuid
+    let proposal: Awaited<ReturnType<typeof Proposal.create>>
+    let uuid: string
 
     beforeEach(async () => {
       const searchSession = await SearchSession.create()

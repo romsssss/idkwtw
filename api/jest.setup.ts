@@ -1,4 +1,4 @@
-const db = require('./src/models').default
+import db from './src/models'
 
 beforeEach(async () => {
   await db.videos.destroy({ truncate: true, cascade: true })

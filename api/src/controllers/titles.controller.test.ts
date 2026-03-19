@@ -1,7 +1,8 @@
-const request = require('supertest')
-const crypto = require('crypto')
-const app = require('../../app').default
-const db = require('../models').default
+import request from 'supertest'
+import crypto from 'crypto'
+import app from '../../app'
+import db from '../models'
+
 const Title = db.titles
 
 describe('#findOne', () => {
@@ -26,7 +27,7 @@ describe('#findOne', () => {
   })
 
   describe('when a valid tconst is given ', () => {
-    let tconst
+    let tconst: string
 
     beforeEach(async () => {
       const title = await Title.create({ tconst: `tt${crypto.randomBytes(4).toString('hex')}` })
