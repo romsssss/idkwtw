@@ -36,6 +36,10 @@ if (window.location.hostname === PRODUCTION_HOST) {
   script.dataset.goatcounter = 'https://idontknowwhattowatch.goatcounter.com/count'
   script.dataset.goatcounterSettings = JSON.stringify({ no_onload: true })
   script.src = '//gc.zgo.at/count.js'
+  script.onload = () => {
+    const path = router.currentRoute.value.path.replace(UUID_RE, ':uuid')
+    window.goatcounter?.count({ path })
+  }
   document.body.appendChild(script)
 }
 
