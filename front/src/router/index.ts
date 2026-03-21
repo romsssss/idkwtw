@@ -33,7 +33,7 @@ const UUID_RE = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi
 if (window.location.hostname === PRODUCTION_HOST) {
   const script = document.createElement('script')
   script.async = true
-  script.dataset.goatcounter = 'https://idkwtw.goatcounter.com/count'
+  script.dataset.goatcounter = 'https://idontknowwhattowatch.goatcounter.com/count'
   script.dataset.goatcounterSettings = JSON.stringify({ no_onload: true })
   script.src = '//gc.zgo.at/count.js'
   document.body.appendChild(script)
