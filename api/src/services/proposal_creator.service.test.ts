@@ -69,6 +69,80 @@ describe('#perform', () => {
       })
     })
 
+    describe('when scenario is kids', () => {
+      beforeEach(() => {
+        MockedVCS.mockImplementation(() => ({
+          perform: () => ({ success: true, body: {} })
+        }))
+      })
+
+      test('excludes titles with excluded genres even if they match selected genres', async () => {
+        await Title.destroy({ where: { tconst: title.tconst } })
+        await Title.create({
+          tconst: `tt${crypto.randomBytes(4).toString('hex')}`,
+          genres: ['Drama', 'Horror'],
+          is_adult: false,
+          runtime_minutes: 90
+        })
+        const kidsSession = await SearchSession.create({
+          public: 'kids',
+          genres: ['Drama']
+        })
+
+        const service = new ProposalCreatorService(kidsSession.uuid)
+        const res = await service.perform()
+
+        if (res.success) throw new Error('Expected failure')
+        expect(res.error.message).toEqual('No title available')
+      })
+
+      test('returns family-friendly titles', async () => {
+        await Title.destroy({ where: { tconst: title.tconst } })
+        await Title.create({
+          tconst: `tt${crypto.randomBytes(4).toString('hex')}`,
+          genres: ['Animation', 'Family'],
+          is_adult: false,
+          runtime_minutes: 90
+        })
+        const kidsSession = await SearchSession.create({
+          public: 'kids',
+          genres: ['Animation']
+        })
+
+        const service = new ProposalCreatorService(kidsSession.uuid)
+        const res = await service.perform()
+
+        expect(res.success).toBe(true)
+      })
+    })
+
+    describe('when scenario is date with explicit Horror genre', () => {
+      beforeEach(() => {
+        MockedVCS.mockImplementation(() => ({
+          perform: () => ({ success: true, body: {} })
+        }))
+      })
+
+      test('user-selected genre overrides scenario exclusion', async () => {
+        await Title.destroy({ where: { tconst: title.tconst } })
+        await Title.create({
+          tconst: `tt${crypto.randomBytes(4).toString('hex')}`,
+          genres: ['Horror'],
+          is_adult: false,
+          runtime_minutes: 120
+        })
+        const dateSession = await SearchSession.create({
+          public: 'date',
+          genres: ['Horror']
+        })
+
+        const service = new ProposalCreatorService(dateSession.uuid)
+        const res = await service.perform()
+
+        expect(res.success).toBe(true)
+      })
+    })
+
     describe('when trailer video cannot be retrieved', () => {
       beforeEach(() => {
         MockedVCS.mockImplementation(() => {
