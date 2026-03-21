@@ -105,7 +105,7 @@ const messages = {
 
 const app = createApp(App)
 const pinia = createPinia()
-const i18n = createI18n({ locale: 'en', allowComposition: true, messages })
+const i18n = createI18n({ locale: 'en', messages })
 
 app.use(pinia)
 app.use(i18n)
