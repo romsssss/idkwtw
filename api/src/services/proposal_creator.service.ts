@@ -1,6 +1,7 @@
 import VideoCreatorService from './video_creator.service'
 import db from '../models'
-import { Op } from 'sequelize'
+import { Op, literal } from 'sequelize'
+import { scenarioConfig } from './scenario_config'
 
 const Proposal = db.proposals
 const SearchSession = db.search_sessions
@@ -105,6 +106,39 @@ class ProposalCreatorService {
 
     if (searchSession.genres) {
       where.genres = { [Op.overlap]: searchSession.genres }
+    }
+
+    const scenario = searchSession.public
+    if (scenario && scenarioConfig[scenario]) {
+      const config = scenarioConfig[scenario]
+
+      where.is_adult = false
+
+      const effectiveExclusions = config.excludeGenres.filter(
+        g => !searchSession.genres?.includes(g)
+      )
+      if (effectiveExclusions.length > 0) {
+        const escapedGenres = effectiveExclusions.map(g => g.replace(/'/g, "''")).join("','")
+        const excludeCondition = literal(`NOT ("title"."genres" && ARRAY['${escapedGenres}']::varchar[])`)
+
+        if (searchSession.genres) {
+          where[Op.and as unknown as string] = [
+            { genres: { [Op.overlap]: searchSession.genres } },
+            literal(`NOT ("title"."genres" && ARRAY['${escapedGenres}']::varchar[])`)
+          ]
+          delete where.genres
+        } else {
+          where[Op.and as unknown as string] = [excludeCondition]
+        }
+      }
+
+      if (config.maxRuntimeMinutes !== null) {
+        const scenarioMax = config.maxRuntimeMinutes
+        const effectiveMax = maximalRuntime
+          ? Math.min(maximalRuntime, scenarioMax)
+          : scenarioMax
+        where.runtime_minutes = { [Op.lte]: effectiveMax }
+      }
     }
 
     return where
