@@ -65,4 +65,19 @@ Three main views driven by `router/index.ts`:
 State is managed via a Pinia store (`stores/main.ts`). UI strings are in `src/i18n/` (currently English only).
 
 ### CI
-GitHub Actions runs API tests (with a PostgreSQL service container) and ESLint on every push/PR touching `api/**`. Node version is read from `api/.node-version`.
+GitHub Actions workflows:
+- **API** (`api-tests.yml`): runs Jest tests (with a PostgreSQL service container) and ESLint on every push/PR touching `api/**`. Node version is read from `api/.node-version`.
+- **Frontend** (`front-e2e.yml`): runs Playwright e2e tests on every push/PR touching `front/**`.
+
+## Deployment & Production
+
+- **URL**: https://idontknowwhattowatch.com/
+- **Hosting**: Vercel (both API and frontend)
+- **Analytics**: GoatCounter — https://idontknowwhattowatch.goatcounter.com/ (production only, no tracking on localhost or preview deploys)
+- **SEO**: Google Search Console is set up (accessible via the `mcp-gsc` MCP server)
+
+## Workflow Conventions
+
+- **Commit messages**: use `type(scope): description` format — e.g. `fix(front):`, `chore(api):`, `feat(front):`, `test(api):`, `perf(front):`, `seo(front):`
+- **PRs over direct pushes**: always create a PR, never push directly to `main`
+- **Branch hygiene**: always start new work from `main` — check `git branch` before beginning a task
