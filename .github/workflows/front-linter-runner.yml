@@ -1,19 +1,19 @@
-name: "(api) Linter"
+name: "(front) Linter"
 
 on:
   workflow_dispatch:
   push:
     paths:
-      - 'api/**'
+      - 'front/**'
     branches:
       - main
   pull_request:
       paths:
-      - 'api/**'
+      - 'front/**'
 
 defaults:
   run:
-    working-directory: api
+    working-directory: front
 
 jobs:
   eslint:
@@ -24,12 +24,10 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version-file: 'api/.node-version'
+          node-version: '20'
           cache: 'npm'
-          cache-dependency-path: 'api'
+          cache-dependency-path: 'front'
       - name: Install dependencies
         run: npm install
       - name: Lint code
         run: npm run lint
-      - name: Type-check code
-        run: npm run typecheck
