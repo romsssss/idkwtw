@@ -22,7 +22,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.0",
-    "@swc/core": "^1.15.18",
+    "@swc/core": "^1.15.21",
     "@swc/jest": "^0.2.39",
     "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
