@@ -99,12 +99,12 @@ class ProposalCreatorService {
     return Array.from(directors)
   }
 
-  private minimalStartYear(searchSession: unknown): number | null {
+  private maximalStartYear(searchSession: unknown): number | null {
     const ss = searchSession as { proposals: Array<{ rejected_feedback: string | null; title?: { start_year: number | null } }> }
     const tooOldYears = ss.proposals
       .filter(p => p.rejected_feedback === 'too_old' && p.title?.start_year)
       .map(p => p.title!.start_year!)
-    return tooOldYears.length <= 0 ? null : Math.min.apply(null, tooOldYears)
+    return tooOldYears.length <= 0 ? null : Math.max.apply(null, tooOldYears)
   }
 
   private maximalRuntime(searchSession: unknown): number | null {
@@ -128,7 +128,7 @@ class ProposalCreatorService {
   }
 
   private titleFilters(searchSession: InstanceType<typeof SearchSession>): Record<string, unknown> {
-    const minimalStartYear = this.minimalStartYear(searchSession)
+    const maximalStartYear = this.maximalStartYear(searchSession)
     const maximalRuntime = this.maximalRuntime(searchSession)
     const where: Record<string, unknown> = {}
 
@@ -137,8 +137,8 @@ class ProposalCreatorService {
       where.tconst = { [Op.notIn]: alreadyProposedTconsts }
     }
 
-    if (minimalStartYear) {
-      where.start_year = { [Op.gt]: minimalStartYear }
+    if (maximalStartYear) {
+      where.start_year = { [Op.gt]: maximalStartYear }
     }
 
     if (maximalRuntime) {
