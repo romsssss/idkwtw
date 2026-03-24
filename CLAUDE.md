@@ -48,7 +48,7 @@ psql $POSTGRES_CONNECTION_URI < database/cleanup.sql
 Two schemas:
 - `imdb_datasets` — staging tables for raw IMDB data
 - `public` — production tables:
-  - `titles` — movie catalog (from IMDB, with ratings/crew)
+  - `titles` — movie catalog (from IMDB, with ratings/crew). Only movies with `average_rating > 6` are imported (see `api/data/seed.sql`), so the rating range in production is ~6.1–10.0.
   - `search_sessions` — user session with viewing scenario (`alone | date | partner | kids | friends | family`) and selected genres
   - `proposals` — recommended movies per session, with acceptance/rejection feedback
   - `videos` — YouTube trailers per title

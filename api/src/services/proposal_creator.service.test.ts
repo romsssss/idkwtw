@@ -143,6 +143,87 @@ describe('#perform', () => {
       })
     })
 
+    describe('when all titles have already been proposed', () => {
+      beforeEach(() => {
+        MockedVCS.mockImplementation(() => ({
+          perform: () => ({ success: true, body: {} })
+        }))
+      })
+
+      test('does not re-propose the same title', async () => {
+        await Title.destroy({ where: {} })
+        await Title.create({
+          tconst: `tt${crypto.randomBytes(4).toString('hex')}`,
+          genres: ['Drama'],
+          is_adult: false,
+          average_rating: 7.5,
+          num_votes: 1000
+        })
+        const session = await SearchSession.create({
+          public: 'alone',
+          genres: ['Drama']
+        })
+
+        // First proposal succeeds
+        const service1 = new ProposalCreatorService(session.uuid)
+        const res1 = await service1.perform()
+        expect(res1.success).toBe(true)
+
+        // Second proposal fails — only title already proposed
+        const service2 = new ProposalCreatorService(session.uuid)
+        const res2 = await service2.perform()
+
+        if (res2.success) throw new Error('Expected failure')
+        expect(res2.error.message).toEqual('No title available')
+      })
+    })
+
+    describe('when a title is rejected as too_violent', () => {
+      beforeEach(() => {
+        MockedVCS.mockImplementation(() => ({
+          perform: () => ({ success: true, body: {} })
+        }))
+      })
+
+      test('excludes action genres from future proposals', async () => {
+        await Title.destroy({ where: {} })
+        const actionTitle = await Title.create({
+          tconst: `tt${crypto.randomBytes(4).toString('hex')}`,
+          genres: ['Action'],
+          is_adult: false,
+          average_rating: 7.5,
+          num_votes: 1000
+        })
+        const dramaTitle = await Title.create({
+          tconst: `tt${crypto.randomBytes(4).toString('hex')}`,
+          genres: ['Drama'],
+          is_adult: false,
+          average_rating: 7.5,
+          num_votes: 1000
+        })
+        const session = await SearchSession.create({
+          public: 'alone',
+          genres: ['Action', 'Drama']
+        })
+
+        // First proposal: force the action title, then reject as too_violent
+        const service1 = new ProposalCreatorService(session.uuid, actionTitle.tconst)
+        await service1.perform()
+        await Proposal.update(
+          { accepted: false, rejected_feedback: 'too_violent' },
+          { where: { search_session_uuid: session.uuid, tconst: actionTitle.tconst } }
+        )
+
+        // Second proposal: should get the drama title (Action excluded by feedback)
+        const service2 = new ProposalCreatorService(session.uuid)
+        const res2 = await service2.perform()
+
+        expect(res2.success).toBe(true)
+        if (!res2.success) throw new Error('Expected success')
+        expect(res2.body.tconst).toEqual(dramaTitle.tconst)
+      })
+    })
+
     describe('when trailer video cannot be retrieved', () => {
       beforeEach(() => {
         MockedVCS.mockImplementation(() => {
