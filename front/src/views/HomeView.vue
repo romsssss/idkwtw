@@ -1,23 +1,20 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { mainStore } from '@/stores/main'
+import { useAsyncAction } from '@/composables/useAsyncAction'
+import LoadingButton from '@/components/LoadingButton.vue'
 
 const router = useRouter()
 const store = mainStore()
 const { t } = useI18n()
-const isLoading = ref(false)
+const { isLoading, run } = useAsyncAction()
 
 async function findMovie() {
-  if (isLoading.value) return
-  isLoading.value = true
-  try {
+  await run(async () => {
     const newSearchSessionUuid = await store.createSearchSession()
     router.push({ name: 'search_session', params: { uuid: newSearchSessionUuid } })
-  } finally {
-    isLoading.value = false
-  }
+  })
 }
 </script>
 
@@ -28,10 +25,10 @@ async function findMovie() {
       <h1 class="title">{{ t('home.title') }}</h1>
       <div class="tagline">{{ t('home.tagline') }}</div>
       <div class="cta-wrapper">
-        <button class="btn btn-cta" :class="{ 'btn-loading': isLoading }" :disabled="isLoading" role="link" @click="findMovie">
+        <LoadingButton variant="cta" :loading="isLoading" role="link" @click="findMovie">
           {{ t('home.ctaLabel') }}
           <i class="fa-solid fa-arrow-right"></i>
-        </button>
+        </LoadingButton>
       </div>
     </div>
   </main>
