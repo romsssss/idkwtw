@@ -80,8 +80,8 @@ class ProposalCreatorService {
 
       let orderSql = 'random() * (average_rating + LOG(GREATEST(num_votes, 1)))'
       if (likedDirs.length > 0) {
-        const escapedDirs = likedDirs.map(d => d.replace(/'/g, "''")).join("','")
-        orderSql += ` * CASE WHEN "title"."directors" && ARRAY['${escapedDirs}']::varchar[] THEN 1.5 ELSE 1 END`
+        const escapedDirs = likedDirs.map(d => db.sequelize.escape(d)).join(',')
+        orderSql += ` * CASE WHEN "title"."directors" && ARRAY[${escapedDirs}]::varchar[] THEN 1.5 ELSE 1 END`
       }
 
       return await Title.findOne({ where, order: literal(orderSql), include: [Video] })
@@ -176,8 +176,8 @@ class ProposalCreatorService {
     )
 
     if (effectiveExclusions.length > 0) {
-      const escapedGenres = effectiveExclusions.map(g => g.replace(/'/g, "''")).join("','")
-      const excludeCondition = literal(`NOT ("title"."genres" && ARRAY['${escapedGenres}']::varchar[])`)
+      const escapedGenres = effectiveExclusions.map(g => db.sequelize.escape(g)).join(',')
+      const excludeCondition = literal(`NOT ("title"."genres" && ARRAY[${escapedGenres}]::varchar[])`)
 
       if (searchSession.genres) {
         where[Op.and as unknown as string] = [
