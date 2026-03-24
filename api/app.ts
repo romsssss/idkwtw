@@ -18,7 +18,8 @@ const app = express()
 if (process.env.NODE_ENV === 'development') {
   app.use(logger('dev'))
 }
-app.use(cors())
+const corsOrigin = process.env.CORS_ORIGIN
+app.use(cors(corsOrigin ? { origin: corsOrigin } : undefined))
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
