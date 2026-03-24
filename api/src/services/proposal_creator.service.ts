@@ -3,6 +3,11 @@ import db from '../models'
 import { Op, literal } from 'sequelize'
 import { scenarioConfig } from './scenario_config'
 
+const FEEDBACK_GENRE_EXCLUSIONS: Record<string, string[]> = {
+  too_violent: ['Action', 'War', 'Crime'],
+  too_scary: ['Horror', 'Thriller'],
+}
+
 const Proposal = db.proposals
 const SearchSession = db.search_sessions
 const Title = db.titles
@@ -71,8 +76,27 @@ class ProposalCreatorService {
       return await Title.findByPk(this.tconst, { include: [Video] })
     } else {
       const where = this.titleFilters(searchSession)
-      return await Title.findOne({ where, order: db.sequelize.random(), include: [Video] })
+      const likedDirs = this.likedDirectors(searchSession)
+
+      let orderSql = 'random() * (average_rating + LOG(GREATEST(num_votes, 1)))'
+      if (likedDirs.length > 0) {
+        const escapedDirs = likedDirs.map(d => d.replace(/'/g, "''")).join("','")
+        orderSql += ` * CASE WHEN "title"."directors" && ARRAY['${escapedDirs}']::varchar[] THEN 1.5 ELSE 1 END`
+      }
+
+      return await Title.findOne({ where, order: literal(orderSql), include: [Video] })
     }
+  }
+
+  private likedDirectors(searchSession: unknown): string[] {
+    const ss = searchSession as { proposals: Array<{ already_seen_feedback: string | null; title?: { directors: string[] | null } }> }
+    const directors = new Set<string>()
+    for (const proposal of ss.proposals) {
+      if (proposal.already_seen_feedback === 'liked' && proposal.title?.directors) {
+        for (const dir of proposal.title.directors) directors.add(dir)
+      }
+    }
+    return Array.from(directors)
   }
 
   private minimalStartYear(searchSession: unknown): number | null {
@@ -91,10 +115,27 @@ class ProposalCreatorService {
     return tooLongRuntimes.length <= 0 ? null : Math.max.apply(null, tooLongRuntimes)
   }
 
+  private feedbackExcludedGenres(searchSession: unknown): string[] {
+    const ss = searchSession as { proposals: Array<{ rejected_feedback: string | null }> }
+    const genres = new Set<string>()
+    for (const proposal of ss.proposals) {
+      const exclusions = FEEDBACK_GENRE_EXCLUSIONS[proposal.rejected_feedback || '']
+      if (exclusions) {
+        for (const genre of exclusions) genres.add(genre)
+      }
+    }
+    return Array.from(genres)
+  }
+
   private titleFilters(searchSession: InstanceType<typeof SearchSession>): Record<string, unknown> {
     const minimalStartYear = this.minimalStartYear(searchSession)
     const maximalRuntime = this.maximalRuntime(searchSession)
     const where: Record<string, unknown> = {}
+
+    const alreadyProposedTconsts = (searchSession as unknown as { proposals: Array<{ tconst: string }> }).proposals?.map(p => p.tconst) || []
+    if (alreadyProposedTconsts.length > 0) {
+      where.tconst = { [Op.notIn]: alreadyProposedTconsts }
+    }
 
     if (minimalStartYear) {
       where.start_year = { [Op.gt]: minimalStartYear }
@@ -108,29 +149,14 @@ class ProposalCreatorService {
       where.genres = { [Op.overlap]: searchSession.genres }
     }
 
+    // Collect genre exclusions from both scenario config and rejection feedback
+    const scenarioExclusions: string[] = []
     const scenario = searchSession.public
     if (scenario && scenarioConfig[scenario]) {
       const config = scenarioConfig[scenario]
 
       where.is_adult = false
-
-      const effectiveExclusions = config.excludeGenres.filter(
-        g => !searchSession.genres?.includes(g)
-      )
-      if (effectiveExclusions.length > 0) {
-        const escapedGenres = effectiveExclusions.map(g => g.replace(/'/g, "''")).join("','")
-        const excludeCondition = literal(`NOT ("title"."genres" && ARRAY['${escapedGenres}']::varchar[])`)
-
-        if (searchSession.genres) {
-          where[Op.and as unknown as string] = [
-            { genres: { [Op.overlap]: searchSession.genres } },
-            literal(`NOT ("title"."genres" && ARRAY['${escapedGenres}']::varchar[])`)
-          ]
-          delete where.genres
-        } else {
-          where[Op.and as unknown as string] = [excludeCondition]
-        }
-      }
+      scenarioExclusions.push(...config.excludeGenres)
 
       if (config.maxRuntimeMinutes !== null) {
         const scenarioMax = config.maxRuntimeMinutes
@@ -138,6 +164,29 @@ class ProposalCreatorService {
           ? Math.min(maximalRuntime, scenarioMax)
           : scenarioMax
         where.runtime_minutes = { [Op.lte]: effectiveMax }
+      }
+    }
+
+    const feedbackExclusions = this.feedbackExcludedGenres(searchSession)
+    const allExclusions = [...new Set([...scenarioExclusions, ...feedbackExclusions])]
+
+    // User-selected genres override exclusions
+    const effectiveExclusions = allExclusions.filter(
+      g => !searchSession.genres?.includes(g)
+    )
+
+    if (effectiveExclusions.length > 0) {
+      const escapedGenres = effectiveExclusions.map(g => g.replace(/'/g, "''")).join("','")
+      const excludeCondition = literal(`NOT ("title"."genres" && ARRAY['${escapedGenres}']::varchar[])`)
+
+      if (searchSession.genres) {
+        where[Op.and as unknown as string] = [
+          { genres: { [Op.overlap]: searchSession.genres } },
+          excludeCondition
+        ]
+        delete where.genres
+      } else {
+        where[Op.and as unknown as string] = [excludeCondition]
       }
     }
 
