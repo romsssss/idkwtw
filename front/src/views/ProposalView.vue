@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import { onMounted, onUnmounted, computed } from 'vue'
+import { onMounted, onUnmounted, computed, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { mainStore } from '@/stores/main'
 import { proposalRejectedFeedback, proposalAlreadySeenFeedback } from '@/models/proposal.model'
@@ -69,28 +69,60 @@ async function fetchData() {
   }
 }
 
+const isLoading = ref(false)
+
 async function accept() {
-  await store.updateProposal(proposal.value?.uuid, { accepted: true })
-  await store.updateSearchSession(searchSession.value?.uuid, { tconst_chosen: title.value?.tconst })
-  window.location.href = imdbUrl.value.toString()
+  if (isLoading.value) return
+  isLoading.value = true
+  try {
+    await store.updateProposal(proposal.value?.uuid, { accepted: true })
+    await store.updateSearchSession(searchSession.value?.uuid, { tconst_chosen: title.value?.tconst })
+    window.location.href = imdbUrl.value.toString()
+  } finally {
+    isLoading.value = false
+  }
 }
 
 async function reject() {
-  await store.updateProposal(proposal.value?.uuid, { accepted: false })
+  if (isLoading.value) return
+  isLoading.value = true
+  try {
+    await store.updateProposal(proposal.value?.uuid, { accepted: false })
+  } finally {
+    isLoading.value = false
+  }
 }
 
 async function rejectFeeback(feedback: string) {
-  await store.updateProposal(proposal.value?.uuid, { rejected_feedback: feedback })
-  await createNewProposal()
+  if (isLoading.value) return
+  isLoading.value = true
+  try {
+    await store.updateProposal(proposal.value?.uuid, { rejected_feedback: feedback })
+    await createNewProposal()
+  } finally {
+    isLoading.value = false
+  }
 }
 
 async function alreadySeen() {
-  await store.updateProposal(proposal.value?.uuid, { already_seen: true, accepted: false })
+  if (isLoading.value) return
+  isLoading.value = true
+  try {
+    await store.updateProposal(proposal.value?.uuid, { already_seen: true, accepted: false })
+  } finally {
+    isLoading.value = false
+  }
 }
 
 async function alreadySeenFeedback(feedback: string) {
-  await store.updateProposal(proposal.value?.uuid, { already_seen_feedback: feedback })
-  await createNewProposal()
+  if (isLoading.value) return
+  isLoading.value = true
+  try {
+    await store.updateProposal(proposal.value?.uuid, { already_seen_feedback: feedback })
+    await createNewProposal()
+  } finally {
+    isLoading.value = false
+  }
 }
 
 async function createNewProposal() {
@@ -134,6 +166,8 @@ async function createNewProposal() {
           v-for="feedback in proposalAlreadySeenFeedback"
           :key="feedback"
           class="btn btn-option"
+          :class="{ 'btn-loading': isLoading }"
+          :disabled="isLoading"
           @click="alreadySeenFeedback(feedback)"
         >
           {{ t(`proposal.alreadySeenFeedback.${feedback}`) }}
@@ -145,18 +179,20 @@ async function createNewProposal() {
           v-for="feedback in proposalRejectedFeedback"
           :key="feedback"
           class="btn btn-option"
+          :class="{ 'btn-loading': isLoading }"
+          :disabled="isLoading"
           @click="rejectFeeback(feedback)"
         >
           {{ t(`proposal.rejectedFeedback.${feedback}`) }}
         </button>
-        <button class="btn btn-option" @click="createNewProposal">
+        <button class="btn btn-option" :class="{ 'btn-loading': isLoading }" :disabled="isLoading" @click="createNewProposal">
           {{ t('proposal.just_skip') }}
         </button>
       </div>
       <div v-else class="main-actions">
-        <button class="btn btn-option uppercase" @click="accept">{{ t('proposal.watchNow') }}</button>
-        <button class="btn btn-option uppercase" @click="reject">{{ t('proposal.skip') }}</button>
-        <button class="btn btn-option uppercase" @click="alreadySeen">{{ t('proposal.seenItAlready') }}</button>
+        <button class="btn btn-option uppercase" :class="{ 'btn-loading': isLoading }" :disabled="isLoading" @click="accept">{{ t('proposal.watchNow') }}</button>
+        <button class="btn btn-option uppercase" :class="{ 'btn-loading': isLoading }" :disabled="isLoading" @click="reject">{{ t('proposal.skip') }}</button>
+        <button class="btn btn-option uppercase" :class="{ 'btn-loading': isLoading }" :disabled="isLoading" @click="alreadySeen">{{ t('proposal.seenItAlready') }}</button>
       </div>
     </div>
   </main>

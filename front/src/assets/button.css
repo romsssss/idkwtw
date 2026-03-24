@@ -86,3 +86,19 @@
 .btn-option label .fa-solid {
   margin-right: 5px;
 }
+
+.btn-loading {
+  pointer-events: none;
+  opacity: 0.7;
+  animation: btn-shimmer 1.2s ease-in-out infinite;
+}
+
+@keyframes btn-shimmer {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}

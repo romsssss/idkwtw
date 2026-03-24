@@ -58,9 +58,17 @@ async function saveGenres() {
   await store.updateSearchSession(searchSession.value?.uuid, { genres: selectedGenres })
 }
 
+const isLoading = ref(false)
+
 async function startProposals() {
-  const newProposalUuid = await store.createProposal(searchSession.value?.uuid)
-  router.push({ name: 'proposal', params: { uuid: newProposalUuid } })
+  if (isLoading.value) return
+  isLoading.value = true
+  try {
+    const newProposalUuid = await store.createProposal(searchSession.value?.uuid)
+    router.push({ name: 'proposal', params: { uuid: newProposalUuid } })
+  } finally {
+    isLoading.value = false
+  }
 }
 
 function setMode(m: string) {
@@ -134,7 +142,7 @@ function setMode(m: string) {
         </div>
       </div>
       <div class="cta-wrapper">
-        <button class="btn btn-cta" role="link" @click="startProposals">
+        <button class="btn btn-cta" :class="{ 'btn-loading': isLoading }" :disabled="isLoading" role="link" @click="startProposals">
           {{ t('searchSession.startSearching') }}
           <i class="fa-solid fa-arrow-right"></i>
         </button>
