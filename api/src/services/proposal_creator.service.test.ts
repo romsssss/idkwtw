@@ -224,6 +224,54 @@ describe('#perform', () => {
       })
     })
 
+    describe('when a liked director boosts future proposals', () => {
+      beforeEach(() => {
+        MockedVCS.mockImplementation(() => ({
+          perform: () => ({ success: true, body: {} })
+        }))
+      })
+
+      test('does not crash when director identifier is used in order clause', async () => {
+        await Title.destroy({ where: {} })
+        const seenTitle = await Title.create({
+          tconst: `tt${crypto.randomBytes(4).toString('hex')}`,
+          genres: ['Drama'],
+          directors: ['nm0000001'],
+          is_adult: false,
+          average_rating: 7.5,
+          num_votes: 1000
+        })
+        const newTitle = await Title.create({
+          tconst: `tt${crypto.randomBytes(4).toString('hex')}`,
+          genres: ['Drama'],
+          directors: ['nm0000001'],
+          is_adult: false,
+          average_rating: 7.5,
+          num_votes: 1000
+        })
+        const session = await SearchSession.create({
+          public: 'alone',
+          genres: ['Drama']
+        })
+
+        // Mark seenTitle as already seen and liked (to trigger director boost)
+        const service1 = new ProposalCreatorService(session.uuid, seenTitle.tconst)
+        await service1.perform()
+        await Proposal.update(
+          { already_seen: true, already_seen_feedback: 'liked' },
+          { where: { search_session_uuid: session.uuid, tconst: seenTitle.tconst } }
+        )
+
+        // Second proposal should use the director boost without SQL errors
+        const service2 = new ProposalCreatorService(session.uuid)
+        const res2 = await service2.perform()
+
+        expect(res2.success).toBe(true)
+        if (!res2.success) throw new Error('Expected success')
+        expect(res2.body.tconst).toEqual(newTitle.tconst)
+      })
+    })
+
     describe('when trailer video cannot be retrieved', () => {
       beforeEach(() => {
         MockedVCS.mockImplementation(() => {
