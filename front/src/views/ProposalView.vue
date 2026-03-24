@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import { onMounted, onUnmounted, computed, ref } from 'vue'
+import { onMounted, onUnmounted, computed, ref, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { mainStore } from '@/stores/main'
 import { proposalRejectedFeedback, proposalAlreadySeenFeedback } from '@/models/proposal.model'
@@ -10,8 +10,8 @@ const route = useRoute()
 const store = mainStore()
 const { t } = useI18n()
 
-const proposalUuid = route.params.uuid as string
-const proposal = computed(() => store.getProposalByUuid(proposalUuid))
+const proposalUuid = computed(() => route.params.uuid as string)
+const proposal = computed(() => store.getProposalByUuid(proposalUuid.value))
 const title = computed(() => store.getTitleByTconst(proposal.value?.tconst))
 const searchSession = computed(() => store.getSearchSessionByUuid(proposal.value?.search_session_uuid))
 
@@ -58,8 +58,8 @@ function unsetVideoEmbedMode() {
 }
 
 async function fetchData() {
-  if (!proposal.value && proposalUuid) {
-    await store.fetchProposal(proposalUuid)
+  if (proposalUuid.value) {
+    await store.fetchProposal(proposalUuid.value)
   }
   if (!title.value && proposal.value?.tconst) {
     await store.fetchTitle(proposal.value.tconst)
@@ -68,6 +68,8 @@ async function fetchData() {
     await store.fetchSearchSession(proposal.value.search_session_uuid)
   }
 }
+
+watch(proposalUuid, () => fetchData())
 
 const isLoading = ref(false)
 
@@ -128,7 +130,6 @@ async function alreadySeenFeedback(feedback: string) {
 async function createNewProposal() {
   const newProposalUuid = await store.createProposal(searchSession.value?.uuid)
   await router.push({ name: 'proposal', params: { uuid: newProposalUuid } })
-  router.go(0) // force page reload
 }
 </script>
 
