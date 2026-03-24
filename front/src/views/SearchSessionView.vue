@@ -4,11 +4,14 @@ import { onMounted, computed, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { mainStore } from '@/stores/main'
 import { searchSessionPublics } from '@/models/search_session.model'
+import { useAsyncAction } from '@/composables/useAsyncAction'
+import LoadingButton from '@/components/LoadingButton.vue'
 
 const router = useRouter()
 const route = useRoute()
 const store = mainStore()
 const { t } = useI18n()
+const { isLoading, run } = useAsyncAction()
 
 const mode = ref('public')
 
@@ -58,17 +61,11 @@ async function saveGenres() {
   await store.updateSearchSession(searchSession.value?.uuid, { genres: selectedGenres })
 }
 
-const isLoading = ref(false)
-
 async function startProposals() {
-  if (isLoading.value) return
-  isLoading.value = true
-  try {
+  await run(async () => {
     const newProposalUuid = await store.createProposal(searchSession.value?.uuid)
     router.push({ name: 'proposal', params: { uuid: newProposalUuid } })
-  } finally {
-    isLoading.value = false
-  }
+  })
 }
 
 function setMode(m: string) {
@@ -142,10 +139,10 @@ function setMode(m: string) {
         </div>
       </div>
       <div class="cta-wrapper">
-        <button class="btn btn-cta" :class="{ 'btn-loading': isLoading }" :disabled="isLoading" role="link" @click="startProposals">
+        <LoadingButton variant="cta" :loading="isLoading" role="link" @click="startProposals">
           {{ t('searchSession.startSearching') }}
           <i class="fa-solid fa-arrow-right"></i>
-        </button>
+        </LoadingButton>
       </div>
     </div>
   </main>
