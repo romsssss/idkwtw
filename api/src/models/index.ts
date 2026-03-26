@@ -16,6 +16,9 @@ const sequelizeOptions: Record<string, unknown> = {
     min: dbConfig.POOL.min,
     acquire: dbConfig.POOL.acquire,
     idle: dbConfig.POOL.idle
+  },
+  define: {
+    schema: 'public'
   }
 }
 
