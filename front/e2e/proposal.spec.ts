@@ -100,7 +100,7 @@ test.describe('Proposal actions', () => {
 
     // Verify already-seen feedback buttons appear
     await expect(page.getByRole('button', { name: 'Liked it' })).toBeVisible()
-    await expect(page.getByRole('button', { name: "Dind't like it" })).toBeVisible()
+    await expect(page.getByRole('button', { name: "Didn't like it" })).toBeVisible()
     await expect(page.getByRole('button', { name: "Don't remember" })).toBeVisible()
 
     // Click "Liked it"
