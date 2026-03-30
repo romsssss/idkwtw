@@ -20,6 +20,39 @@ useHead({
 useSeoMeta({
   description: computed(() => collection.value?.metaDescription ?? '')
 })
+useHead({
+  script: computed(() => {
+    const c = collection.value
+    if (!c) return []
+    return [
+      {
+        type: 'application/ld+json',
+        innerHTML: JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'ItemList',
+          name: c.title,
+          description: c.metaDescription,
+          numberOfItems: c.movies.length,
+          itemListElement: c.movies.map((movie, i) => ({
+            '@type': 'ListItem',
+            position: i + 1,
+            item: {
+              '@type': 'Movie',
+              name: movie.primary_title,
+              dateCreated: String(movie.start_year),
+              ...(movie.director && {
+                director: { '@type': 'Person', name: movie.director }
+              }),
+              ...(movie.posterUrl && { image: movie.posterUrl }),
+              ...(movie.plot && { description: movie.plot }),
+              url: `https://www.imdb.com/title/${movie.tconst}/`
+            }
+          }))
+        })
+      }
+    ]
+  })
+})
 
 async function startSession() {
   await run(async () => {
@@ -92,6 +125,13 @@ async function startSession() {
           {{ COLLECTION_BY_SLUG[slug]?.title ?? slug }}
         </RouterLink>
       </nav>
+    </div>
+  </main>
+  <main v-else class="main-flex">
+    <div class="main-flex-content">
+      <h1 class="title">Collection not found</h1>
+      <p class="not-found-text">This movie collection doesn't exist.</p>
+      <RouterLink to="/" class="not-found-link">Back to home</RouterLink>
     </div>
   </main>
 </template>
@@ -252,5 +292,14 @@ async function startSession() {
 
 .related-link:hover {
   background: var(--color-background-soft);
+}
+
+.not-found-text {
+  color: var(--color-text-dark-1);
+  margin-bottom: 20px;
+}
+
+.not-found-link {
+  color: var(--color-secondary);
 }
 </style>

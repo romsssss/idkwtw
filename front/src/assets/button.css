@@ -12,9 +12,9 @@
   padding: 14px 35px;
   border: 2px solid var(--color-primary);
   box-shadow: inset 0 0 0 0 var(--color-primary);
-  -webkit-transition: ease-out 0.8s;
-  -moz-transition: ease-out 0.8s;
-  transition: ease-out 0.8s;
+  -webkit-transition: ease-out 1.6s;
+  -moz-transition: ease-out 1.6s;
+  transition: ease-out 1.6s;
 }
 
 .btn-cta .fa-arrow-right {
@@ -22,7 +22,7 @@
 }
 
 .btn-cta:hover {
-  box-shadow: inset 400px 0 0 0 var(--color-primary);
+  box-shadow: inset 800px 0 0 0 var(--color-primary);
   color: var(--color-text-dark-2);
 }
 
@@ -33,13 +33,13 @@
   font-family: 'Caprasimo', sans-serif;
   border: 1px solid var(--color-text-dark-1);
   box-shadow: inset 0 0 0 0 var(--color-secondary);
-  -webkit-transition: ease-out 0.8s;
-  -moz-transition: ease-out 0.8s;
-  transition: ease-out 0.8s;
+  -webkit-transition: ease-out 1.6s;
+  -moz-transition: ease-out 1.6s;
+  transition: ease-out 1.6s;
 }
 
 .btn-logo:hover {
-  box-shadow: inset 400px 0 0 0 var(--color-secondary);
+  box-shadow: inset 800px 0 0 0 var(--color-secondary);
   border-color: var(--color-secondary);
   color: var(--color-text);
 }
