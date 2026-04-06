@@ -12,7 +12,7 @@ INSERT INTO titles
   WHERE
     title_type = 'movie'
     AND NOT ('Adult' = ANY (genres))
-    AND average_rating > 6
+    AND average_rating > 7
   ORDER BY
     tconst
 ON CONFLICT DO NOTHING
