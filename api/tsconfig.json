@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "commonjs",
+    "module": "node16",
     "lib": ["ES2022"],
     "outDir": "./dist",
     "rootDir": ".",
@@ -12,7 +12,7 @@
     "resolveJsonModule": true,
     "sourceMap": true,
     "allowJs": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node16"
   },
   "include": ["src/**/*.ts", "config/**/*.ts", "app.ts", "jest.setup.ts"],
   "exclude": ["node_modules", "dist", "coverage"]
