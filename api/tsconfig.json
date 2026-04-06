@@ -12,7 +12,8 @@
     "resolveJsonModule": true,
     "sourceMap": true,
     "allowJs": true,
-    "moduleResolution": "node16"
+    "moduleResolution": "node16",
+    "types": ["node", "jest"]
   },
   "include": ["src/**/*.ts", "config/**/*.ts", "app.ts", "jest.setup.ts"],
   "exclude": ["node_modules", "dist", "coverage"]
