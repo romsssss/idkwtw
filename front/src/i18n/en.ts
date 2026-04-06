@@ -7,7 +7,8 @@ export const en = {
     subtitle: 'Movie recommendation engine',
     tagline:
       "You can't find anyththing to watch tonight ? Answer 2 simple questions and the engine will start showing you movie trailers !",
-    ctaLabel: 'Find a movie'
+    ctaLabel: 'Find a movie',
+    collectionsTitle: 'Or browse by mood'
   },
   searchSession: {
     public: {
