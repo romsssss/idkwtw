@@ -6,7 +6,7 @@ export const en = {
     title: "I Don't Know What To Watch",
     subtitle: 'Movie recommendation engine',
     tagline:
-      "You can't find anyththing to watch tonight ? Answer 2 simple questions and the engine will start showing you movie trailers !",
+      "You can't find anything to watch tonight ? Answer 2 simple questions and the engine will start showing you movie trailers !",
     ctaLabel: 'Find a movie',
     collectionsTitle: 'Or browse by mood'
   },
