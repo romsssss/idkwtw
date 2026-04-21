@@ -62,11 +62,21 @@
   padding: 10px;
 }
 
-.btn-option:has(input[type='checkbox']:checked),
-.btn-option:has(input[type='radio']:checked),
 .btn-option:hover {
+  border-color: rgba(255, 255, 255, 0.7);
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.btn-option:has(input[type='checkbox']:checked),
+.btn-option:has(input[type='radio']:checked) {
   border-color: var(--color-secondary);
   background-color: var(--color-secondary);
+}
+
+.btn-option:has(input[type='checkbox']:checked):hover,
+.btn-option:has(input[type='radio']:checked):hover {
+  border-color: #c32a0f;
+  background-color: #c32a0f;
 }
 
 .btn-option label input[type='checkbox'],
