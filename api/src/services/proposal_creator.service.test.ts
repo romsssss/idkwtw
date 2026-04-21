@@ -272,6 +272,35 @@ describe('#perform', () => {
       })
     })
 
+    describe('when title already has a video in the database', () => {
+      beforeEach(async () => {
+        const Video = db.videos
+        await Video.create({
+          tconst: title.tconst,
+          name: 'Official Trailer',
+          type: 'trailer',
+          site: 'youtube',
+          key: 'abc123',
+          size: 1080,
+          official: true,
+          iso_639_1: 'en',
+          iso_3166_1: 'US',
+          published_at: new Date()
+        })
+        MockedVCS.mockImplementation(() => {
+          throw new Error('VideoCreatorService should not be called')
+        })
+      })
+
+      test('returns success true without calling VideoCreatorService', async () => {
+        const service = new ProposalCreatorService(searchSession.uuid)
+        const res = await service.perform()
+
+        expect(res.success).toBe(true)
+        expect(MockedVCS).not.toHaveBeenCalled()
+      })
+    })
+
     describe('when trailer video cannot be retrieved', () => {
       beforeEach(() => {
         MockedVCS.mockImplementation(() => {
