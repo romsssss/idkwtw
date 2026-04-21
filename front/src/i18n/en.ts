@@ -78,6 +78,9 @@ export const en = {
     skip: 'Skip',
     watchNow: 'Watch now',
     seenItAlready: 'Seen it already',
+    skippingWhy: 'Skipping — why?',
+    seenItHowWasIt: 'Seen it — how was it?',
+    openingImdb: 'Opening IMDb…',
     just_skip: 'Just skip',
     alreadySeenFeedback: {
       liked: 'Liked it',

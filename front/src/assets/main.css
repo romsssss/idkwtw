@@ -38,6 +38,7 @@ html.video-embed-mode {
 header.video-embed-mode {
   position: absolute;
   top: 0;
+  z-index: 10;
 }
 
 #app {
