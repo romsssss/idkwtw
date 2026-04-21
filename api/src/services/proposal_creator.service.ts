@@ -57,7 +57,9 @@ class ProposalCreatorService {
         }
       } while (!this.tconst && attempts <= 10 && !((title as unknown as { video?: unknown }).video || videoCreatorServiceRes?.success))
 
-      if (!videoCreatorServiceRes?.success) { throw videoCreatorServiceRes?.error || new Error('No video found') }
+      if (!(title as unknown as { video?: unknown }).video && !videoCreatorServiceRes?.success) {
+        throw videoCreatorServiceRes?.error || new Error('No video found')
+      }
 
       const proposalParams = {
         tconst: title.tconst,
