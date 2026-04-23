@@ -14,7 +14,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
-    "@unhead/vue": "^2.1.13",
+    "@unhead/vue": "^3.0.5",
     "node-fetch": "^3.3.1",
     "pinia": "^3.0.4",
     "vite-ssg": "^28.3.0",
