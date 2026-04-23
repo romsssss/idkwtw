@@ -15,7 +15,11 @@ const { isLoading, run } = useAsyncAction()
 const collection = computed(() => COLLECTION_BY_SLUG[route.params.slug as string])
 
 useHead({
-  title: computed(() => collection.value?.seoTitle ?? "I Don't Know What To Watch")
+  title: computed(() => collection.value?.seoTitle ?? "I Don't Know What To Watch"),
+  link: computed(() => {
+    const slug = route.params.slug as string
+    return [{ rel: 'canonical', href: `https://idontknowwhattowatch.com/movies/${slug}` }]
+  })
 })
 useSeoMeta({
   description: computed(() => collection.value?.metaDescription ?? '')

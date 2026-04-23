@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
+import { useHead } from '@unhead/vue'
 import { useRouter } from 'vue-router'
 import { mainStore } from '@/stores/main'
 import { useAsyncAction } from '@/composables/useAsyncAction'
@@ -10,6 +11,10 @@ const router = useRouter()
 const store = mainStore()
 const { t } = useI18n()
 const { isLoading, run } = useAsyncAction()
+
+useHead({
+  link: [{ rel: 'canonical', href: 'https://idontknowwhattowatch.com/' }]
+})
 
 async function findMovie() {
   await run(async () => {
