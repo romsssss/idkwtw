@@ -23,6 +23,10 @@ updates:
       minor-and-patch:
         patterns: ["*"]
         update-types: ["minor", "patch"]
+    ignore:
+      # vite-ssg@28.x requires @unhead/vue@^2; block v3 majors until vite-ssg supports it.
+      - dependency-name: "@unhead/vue"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: "github-actions"
     directory: "/"

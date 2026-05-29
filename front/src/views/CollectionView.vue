@@ -22,7 +22,10 @@ useHead({
   })
 })
 useSeoMeta({
-  description: computed(() => collection.value?.metaDescription ?? '')
+  description: computed(() => collection.value?.metaDescription ?? ''),
+  ogTitle: computed(() => collection.value?.seoTitle ?? "I Don't Know What To Watch"),
+  ogDescription: computed(() => collection.value?.metaDescription ?? ''),
+  ogUrl: computed(() => `https://idontknowwhattowatch.com/movies/${route.params.slug}`)
 })
 useHead({
   script: computed(() => {
