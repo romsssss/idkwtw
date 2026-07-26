@@ -31,6 +31,9 @@ updates:
       # vite-ssg@28.x requires @unhead/vue@^2; block v3 majors until vite-ssg supports it.
       - dependency-name: "@unhead/vue"
         update-types: ["version-update:semver-major"]
+      # vue-tsc and typescript-eslint have no TypeScript 7 support yet; block v7 majors until they do.
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: "github-actions"
     directory: "/"
