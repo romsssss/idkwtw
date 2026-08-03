@@ -180,6 +180,16 @@ describe('#update ', () => {
             expect(response.body.public).toEqual('friends')
           })
       })
+
+      test('records exit feedback with a note', async () => {
+        return request(app)
+          .put(`/search_sessions/${uuid}`)
+          .send({ exit_feedback: 'other', exit_feedback_note: 'Wish you had a surprise me button' })
+          .then(response => {
+            expect(response.body.exit_feedback).toEqual('other')
+            expect(response.body.exit_feedback_note).toEqual('Wish you had a surprise me button')
+          })
+      })
     })
 
     describe('with invalid parameters', () => {
@@ -187,6 +197,13 @@ describe('#update ', () => {
         return request(app)
           .put(`/search_sessions/${uuid}`)
           .send({ public: 'not-a-valid-public' })
+          .expect(422)
+      })
+
+      test('returns a 422 status code for an invalid exit_feedback', async () => {
+        return request(app)
+          .put(`/search_sessions/${uuid}`)
+          .send({ exit_feedback: 'not-a-valid-feedback' })
           .expect(422)
       })
 

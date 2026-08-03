@@ -82,6 +82,10 @@ export const en = {
     seenItHowWasIt: 'Seen it — how was it?',
     openingImdb: 'Opening IMDb…',
     just_skip: 'Just skip',
+    notFindingPick: "Not finding your pick? What's going on?",
+    keepLooking: 'Keep looking',
+    exitNotePlaceholder: 'Tell us what you were after…',
+    exitNoteSubmit: 'Send',
     alreadySeenFeedback: {
       liked: 'Liked it',
       disliked: "Didn't like it",
@@ -92,6 +96,12 @@ export const en = {
       too_old: 'Too old',
       too_violent: 'Too violent',
       too_scary: 'Too scary'
+    },
+    exitFeedback: {
+      just_browsing: 'Just browsing',
+      nothing_fits_mood: 'Nothing fits my mood',
+      dont_know_movies: "I don't know these movies",
+      other: 'Something else…'
     }
   }
 }
