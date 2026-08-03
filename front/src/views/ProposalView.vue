@@ -1,10 +1,17 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import { onMounted, onUnmounted, computed, watch } from 'vue'
+import { onMounted, onUnmounted, computed, watch, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { mainStore } from '@/stores/main'
 import { proposalRejectedFeedback, proposalAlreadySeenFeedback } from '@/models/proposal.model'
+import { searchSessionExitFeedback } from '@/models/search_session.model'
 import { useAsyncAction } from '@/composables/useAsyncAction'
+
+// After this many skips in a session, the "why are you skipping?" prompt is
+// replaced once by a session-level "not finding your pick?" prompt.
+const EXIT_PROMPT_SKIP_THRESHOLD = 4
+
+const exitFeedbackOptions = searchSessionExitFeedback.filter((option) => option !== 'other')
 
 const router = useRouter()
 const route = useRoute()
@@ -23,6 +30,21 @@ const state = computed(() => {
   if (proposal.value?.accepted === false) return 'rejected'
   return 'choosing'
 })
+
+const showExitNote = ref(false)
+const exitNote = ref('')
+
+// Number of movies skipped (not "already seen") so far in this session.
+const sessionSkipCount = computed(
+  () =>
+    store.proposals.filter(
+      (p) => p.search_session_uuid === searchSession.value?.uuid && p.accepted === false && p.already_seen !== true
+    ).length
+)
+
+// Swap the per-skip reason prompt for the session-level exit prompt, once,
+// exactly on the Nth skip.
+const showExitPrompt = computed(() => state.value === 'rejected' && sessionSkipCount.value === EXIT_PROMPT_SKIP_THRESHOLD)
 
 onMounted(async () => {
   setVideoEmbedMode()
@@ -78,7 +100,10 @@ async function fetchData() {
   }
 }
 
-watch(proposalUuid, () => fetchData())
+watch(proposalUuid, () => {
+  showExitNote.value = false
+  fetchData()
+})
 
 async function accept() {
   await run(async () => {
@@ -110,6 +135,23 @@ async function alreadySeen() {
 async function alreadySeenFeedback(feedback: string) {
   await run(async () => {
     await store.updateProposal(proposal.value?.uuid, { already_seen_feedback: feedback })
+    await createNewProposal()
+  })
+}
+
+async function submitExitFeedback(feedback: string) {
+  await run(async () => {
+    await store.updateSearchSession(searchSession.value?.uuid, { exit_feedback: feedback })
+    await createNewProposal()
+  })
+}
+
+async function submitExitNote() {
+  await run(async () => {
+    await store.updateSearchSession(searchSession.value?.uuid, {
+      exit_feedback: 'other',
+      exit_feedback_note: exitNote.value.trim() || null
+    })
     await createNewProposal()
   })
 }
@@ -163,22 +205,59 @@ async function createNewProposal() {
           </div>
 
           <div v-else-if="state === 'rejected'" class="feedback">
-            <div class="feedback-label">{{ t('proposal.skippingWhy') }}</div>
-            <div class="feedback-row">
-              <button
-                v-for="feedback in proposalRejectedFeedback"
-                :key="feedback"
-                class="btn-v2-pill"
-                :class="{ 'btn-loading': isLoading }"
-                :disabled="isLoading"
-                @click="rejectFeeback(feedback)"
-              >
-                {{ t(`proposal.rejectedFeedback.${feedback}`) }}
-              </button>
-              <button class="btn-v2-pill" :class="{ 'btn-loading': isLoading }" :disabled="isLoading" @click="createNewProposal">
-                {{ t('proposal.just_skip') }}
-              </button>
-            </div>
+            <template v-if="showExitPrompt">
+              <div class="feedback-label">{{ t('proposal.notFindingPick') }}</div>
+              <div v-if="!showExitNote" class="feedback-row">
+                <button
+                  v-for="option in exitFeedbackOptions"
+                  :key="option"
+                  class="btn-v2-pill"
+                  :class="{ 'btn-loading': isLoading }"
+                  :disabled="isLoading"
+                  @click="submitExitFeedback(option)"
+                >
+                  {{ t(`proposal.exitFeedback.${option}`) }}
+                </button>
+                <button class="btn-v2-pill" :class="{ 'btn-loading': isLoading }" :disabled="isLoading" @click="showExitNote = true">
+                  {{ t('proposal.exitFeedback.other') }}
+                </button>
+                <button class="btn-v2-pill pill-ghost" :disabled="isLoading" @click="createNewProposal">
+                  {{ t('proposal.keepLooking') }} →
+                </button>
+              </div>
+              <div v-else class="exit-note-row">
+                <input
+                  v-model="exitNote"
+                  class="exit-note-input"
+                  type="text"
+                  maxlength="280"
+                  :placeholder="t('proposal.exitNotePlaceholder')"
+                  :disabled="isLoading"
+                  @keyup.enter="submitExitNote"
+                />
+                <button class="btn-v2-primary" :class="{ 'btn-loading': isLoading }" :disabled="isLoading" @click="submitExitNote">
+                  {{ t('proposal.exitNoteSubmit') }}
+                </button>
+              </div>
+            </template>
+            <template v-else>
+              <div class="feedback-label">{{ t('proposal.skippingWhy') }}</div>
+              <div class="feedback-row">
+                <button
+                  v-for="feedback in proposalRejectedFeedback"
+                  :key="feedback"
+                  class="btn-v2-pill"
+                  :class="{ 'btn-loading': isLoading }"
+                  :disabled="isLoading"
+                  @click="rejectFeeback(feedback)"
+                >
+                  {{ t(`proposal.rejectedFeedback.${feedback}`) }}
+                </button>
+                <button class="btn-v2-pill" :class="{ 'btn-loading': isLoading }" :disabled="isLoading" @click="createNewProposal">
+                  {{ t('proposal.just_skip') }}
+                </button>
+              </div>
+            </template>
           </div>
 
           <div v-else-if="state === 'alreadySeen'" class="feedback">
@@ -273,6 +352,16 @@ async function createNewProposal() {
 }
 .feedback-row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
 
+.exit-note-row { display: flex; gap: 8px; align-items: stretch; }
+.exit-note-input {
+  font-family: inherit; font-size: 0.95em; color: #fff;
+  padding: 12px 16px; border-radius: 4px; width: 320px; max-width: 60vw;
+  border: 1px solid rgba(255,255,255,0.25);
+  background: rgba(20,18,16,0.55); backdrop-filter: blur(8px);
+}
+.exit-note-input::placeholder { color: #A0A0A0; }
+.exit-note-input:focus { outline: none; border-color: rgba(255,255,255,0.55); }
+
 .accepted {
   display: inline-flex; align-items: center; gap: 12px;
   padding: 14px 24px; border-radius: 4px;
@@ -295,6 +384,8 @@ async function createNewProposal() {
   .feedback-label { text-align: left; }
   .feedback-row { justify-content: flex-start; }
   .feedback-row .btn-v2-pill { flex: 1 1 calc(50% - 4px); justify-content: center; min-width: 0; }
+  .exit-note-row { flex-direction: column; }
+  .exit-note-input { width: 100%; max-width: 100%; }
   .accepted { justify-content: center; width: 100%; }
 }
 </style>

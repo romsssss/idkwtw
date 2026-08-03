@@ -17,11 +17,15 @@ CREATE TABLE IF NOT EXISTS public.titles (
 
 DROP TYPE IF EXISTS public.enum_search_sessions_public CASCADE;
 CREATE TYPE public.enum_search_sessions_public AS ENUM ('alone', 'date', 'partner', 'kids', 'friends', 'family');
+DROP TYPE IF EXISTS public.enum_search_sessions_exit_feedback CASCADE;
+CREATE TYPE public.enum_search_sessions_exit_feedback AS ENUM ('just_browsing', 'nothing_fits_mood', 'dont_know_movies', 'other');
 CREATE TABLE IF NOT EXISTS public.search_sessions (
     uuid uuid NOT NULL,
     public enum_search_sessions_public,
     genres VARCHAR(255)[],
     tconst_chosen varchar,
+    exit_feedback public.enum_search_sessions_exit_feedback,
+    exit_feedback_note varchar,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL,
      PRIMARY KEY (uuid)
