@@ -70,12 +70,6 @@ const youtubeEmbedUrl = computed(() => {
   return url
 })
 
-const imdbUrl = computed(() => {
-  const url = new URL(`https://www.imdb.com/title/${title.value?.tconst}`)
-
-  return url
-})
-
 function setVideoEmbedMode() {
   document.documentElement.classList.add('video-embed-mode')
   document.getElementById('app')?.classList.add('video-embed-mode')
@@ -109,7 +103,7 @@ async function accept() {
   await run(async () => {
     await store.updateProposal(proposal.value?.uuid, { accepted: true })
     await store.updateSearchSession(searchSession.value?.uuid, { tconst_chosen: title.value?.tconst })
-    window.location.href = imdbUrl.value.toString()
+    await router.push({ name: 'watch', params: { uuid: proposalUuid.value } })
   })
 }
 
@@ -278,7 +272,7 @@ async function createNewProposal() {
 
           <div v-else-if="state === 'accepted'" class="accepted">
             <span class="celebrate">🎉</span>
-            <span>{{ t('proposal.openingImdb') }}</span>
+            <span>{{ t('proposal.findingWatch') }}</span>
           </div>
         </div>
       </div>

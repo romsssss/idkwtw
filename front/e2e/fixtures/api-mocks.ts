@@ -52,12 +52,31 @@ export function buildTitle(overrides?: Record<string, unknown>) {
   }
 }
 
+export function buildWatchProviders(overrides?: Record<string, unknown>) {
+  return {
+    region: 'US',
+    poster_url: 'https://image.tmdb.org/t/p/w500/poster.jpg',
+    overview: 'A gripping tale that keeps you on the edge of your seat.',
+    link: 'https://www.themoviedb.org/movie/1/watch?locale=US',
+    flatrate: [
+      { provider_id: 8, provider_name: 'Netflix', logo_url: 'https://image.tmdb.org/t/p/w92/netflix.jpg' }
+    ],
+    rent: [
+      { provider_id: 2, provider_name: 'Apple TV', logo_url: 'https://image.tmdb.org/t/p/w92/apple.jpg' }
+    ],
+    buy: [],
+    ...overrides
+  }
+}
+
 interface SetupApiMocksOptions {
   searchSession: ReturnType<typeof buildSearchSession>
   proposals: ReturnType<typeof buildProposal>[]
   /** Queue for POST /proposals responses. Defaults to `proposals` if not provided. */
   proposalQueue?: ReturnType<typeof buildProposal>[]
   titles: ReturnType<typeof buildTitle>[]
+  /** Response for GET /titles/:tconst/watch. Defaults to `buildWatchProviders()`. */
+  watchProviders?: ReturnType<typeof buildWatchProviders>
 }
 
 export async function setupApiMocks(page: Page, options: SetupApiMocksOptions) {
@@ -156,6 +175,8 @@ export async function setupApiMocks(page: Page, options: SetupApiMocksOptions) {
   await page.route('**/titles/*', (route) => {
     if (isPageNavigation(route)) return route.continue()
     const url = route.request().url()
+    // Watch-provider requests are handled by a dedicated route below.
+    if (url.includes('/watch')) return route.fallback()
     const matchedTitle = titles.find((t) => url.includes(t.tconst))
     if (matchedTitle) {
       return route.fulfill({
@@ -166,4 +187,19 @@ export async function setupApiMocks(page: Page, options: SetupApiMocksOptions) {
     }
     return route.continue()
   })
+
+  // GET /titles/:tconst/watch (registered last so it takes precedence).
+  // Trailing `*` also matches an optional `?region=` query string.
+  const watchProviders = options.watchProviders ?? buildWatchProviders()
+  await page.route('**/titles/*/watch*', (route) => {
+    if (isPageNavigation(route)) return route.continue()
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(watchProviders)
+    })
+  })
+
+  // Provider logos point at TMDB's image CDN; keep e2e offline.
+  await page.route('**/image.tmdb.org/**', (route) => route.abort())
 }
