@@ -173,8 +173,6 @@ async function createNewProposal() {
     >
     </iframe>
 
-    <div class="trailer-guard" />
-
     <div class="top-scrim" />
     <div class="bottom-scrim">
       <div class="bottom-content">
@@ -285,10 +283,6 @@ async function createNewProposal() {
 <style scoped>
 .proposal-screen { background: #000; overflow: hidden; position: relative; }
 .trailer { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
-/* Transparent layer over the iframe: swallows pointer events so YouTube's
-   native play/pause overlay never activates. Action buttons live in the
-   scrims above (higher z-index), so they still receive clicks. */
-.trailer-guard { position: absolute; inset: 0; z-index: 2; }
 
 .top-scrim {
   position: absolute; inset: 0 0 auto 0; height: 140px;
