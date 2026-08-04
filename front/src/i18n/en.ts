@@ -80,7 +80,7 @@ export const en = {
     seenItAlready: 'Seen it already',
     skippingWhy: 'Skipping — why?',
     seenItHowWasIt: 'Seen it — how was it?',
-    openingImdb: 'Opening IMDb…',
+    findingWatch: 'Finding where to watch…',
     just_skip: 'Just skip',
     notFindingPick: "Not finding your pick? What's going on?",
     keepLooking: 'Keep looking',
@@ -103,5 +103,18 @@ export const en = {
       dont_know_movies: "I don't know these movies",
       other: 'Something else…'
     }
+  },
+  watch: {
+    eyebrow: "Nice pick — here's the plan",
+    whereToWatch: 'Where to watch',
+    stream: 'Stream',
+    rentOrBuy: 'Rent or buy',
+    subscription: 'Subscription',
+    finishBy: 'Start now, finish by {time}',
+    loading: 'Finding where to watch…',
+    unavailable: 'No streaming options found in your region right now.',
+    loadError: "Couldn't load streaming options — try again or open IMDb below.",
+    findAnother: 'Not tonight — find me another',
+    imdbDetails: 'Full details on IMDb'
   }
 }

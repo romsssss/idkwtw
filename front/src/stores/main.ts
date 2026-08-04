@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import type { SearchSession } from '@/models/search_session.model'
 import type { Proposal } from '@/models/proposal.model'
 import type { Title } from '@/models/title.model'
+import type { WatchProviders, WatchProvidersEntry } from '@/models/watch_provider.model'
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
 
@@ -9,9 +10,13 @@ export const mainStore = defineStore('main_store', {
   state: () => ({
     searchSessions: [] as SearchSession[],
     proposals: [] as Proposal[],
-    titles: [] as Title[]
+    titles: [] as Title[],
+    watchProviders: [] as WatchProvidersEntry[]
   }),
   getters: {
+    getWatchProvidersByTconst: (state) => {
+      return (tconst: string | undefined) => state.watchProviders.find((entry) => entry.tconst === tconst)
+    },
     getSearchSessionByUuid: (state) => {
       return (uuid: string | undefined) => state.searchSessions.find((searchSession) => searchSession.uuid === uuid)
     },
@@ -23,6 +28,27 @@ export const mainStore = defineStore('main_store', {
     }
   },
   actions: {
+    async fetchWatchProviders(tconst: string, region?: string) {
+      const entry: WatchProvidersEntry = { tconst, data: null, error: false }
+
+      try {
+        const query = region ? `?${new URLSearchParams({ region })}` : ''
+        const response = await fetch(`${apiBaseUrl}/titles/${tconst}/watch${query}`)
+        if (!response.ok) throw new Error(`Unexpected status ${response.status}`)
+        entry.data = (await response.json()) as unknown as WatchProviders
+      } catch {
+        entry.error = true
+      }
+
+      const index = this.watchProviders.findIndex((e) => e.tconst === tconst)
+      this.$patch((state) => {
+        if (index === -1) {
+          state.watchProviders.push(entry)
+        } else {
+          state.watchProviders[index] = entry
+        }
+      })
+    },
     async fetchTitle(tconst: string) {
       const response = await fetch(`${apiBaseUrl}/titles/${tconst}`)
       const title = (await response.json()) as unknown as Title

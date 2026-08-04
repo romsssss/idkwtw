@@ -26,5 +26,10 @@ export const routes: RouteRecordRaw[] = [
     path: '/proposals/:uuid',
     name: 'proposal',
     component: () => import('../views/ProposalView.vue')
+  },
+  {
+    path: '/proposals/:uuid/watch',
+    name: 'watch',
+    component: () => import('../views/WatchView.vue')
   }
 ]

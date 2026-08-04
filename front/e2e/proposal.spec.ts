@@ -21,7 +21,7 @@ test.describe('Proposal actions', () => {
     genres: ['Drama', 'Thriller']
   })
 
-  test('"Watch now" accepts and navigates to IMDb', async ({ page }) => {
+  test('"Watch now" accepts and navigates to the watch page', async ({ page }) => {
     const ss = { ...searchSession }
     const p1 = { ...proposal1 }
     const t1 = { ...title1 }
@@ -32,15 +32,32 @@ test.describe('Proposal actions', () => {
       titles: [t1]
     })
 
-    // Intercept IMDb navigation to prevent leaving the page
-    await page.route('**/imdb.com/**', (route) => route.abort())
-
     await page.goto(`/proposals/${p1.uuid}`)
     await expect(page.getByText(t1.primary_title)).toBeVisible()
 
-    const imdbRequest = page.waitForRequest((r) => r.url().includes('imdb.com'))
     await page.getByRole('button', { name: 'Watch now' }).click()
-    await imdbRequest
+
+    // Lands on the in-app "where to watch" page with providers from TMDB.
+    await expect(page).toHaveURL(new RegExp(`/proposals/${p1.uuid}/watch$`))
+    await expect(page.getByRole('heading', { name: 'Where to watch' })).toBeVisible()
+    await expect(page.getByText('Netflix')).toBeVisible()
+  })
+
+  test('forwards ?region on the watch route to the API call', async ({ page }) => {
+    const ss = { ...searchSession }
+    const p1 = { ...proposal1 }
+    const t1 = { ...title1 }
+
+    await setupApiMocks(page, {
+      searchSession: ss,
+      proposals: [p1],
+      titles: [t1]
+    })
+
+    const watchRequest = page.waitForRequest((r) => /\/titles\/.*\/watch\?.*region=FR/.test(r.url()))
+    await page.goto(`/proposals/${p1.uuid}/watch?region=FR`)
+    await watchRequest
+    await expect(page.getByText('Netflix')).toBeVisible()
   })
 
   test('"Skip" shows feedback then creates new proposal', async ({ page }) => {
