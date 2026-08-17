@@ -272,6 +272,167 @@ describe('#perform', () => {
       })
     })
 
+    describe('popularity weighting', () => {
+      beforeEach(() => {
+        MockedVCS.mockImplementation(() => ({
+          perform: () => ({ success: true, body: {} })
+        }))
+      })
+
+      // Draw repeatedly from a fresh session each time so the already-proposed filter never
+      // narrows the pool, and count how often the popular title comes back.
+      async function drawShare(popularTconst: string, draws: number, exitFeedback?: 'dont_know_movies') {
+        let popularPicks = 0
+
+        for (let i = 0; i < draws; i++) {
+          const session = await SearchSession.create({
+            public: 'alone',
+            genres: ['Drama'],
+            ...(exitFeedback ? { exit_feedback: exitFeedback } : {})
+          })
+          const res = await new ProposalCreatorService(session.uuid).perform()
+
+          if (!res.success) throw new Error('Expected success')
+          if (res.body.tconst === popularTconst) popularPicks += 1
+        }
+
+        return popularPicks / draws
+      }
+
+      async function seedPair() {
+        await Title.destroy({ where: {} })
+        const popular = await Title.create({
+          tconst: `tt${crypto.randomBytes(4).toString('hex')}`,
+          genres: ['Drama'],
+          is_adult: false,
+          average_rating: 7.5,
+          num_votes: 1_000_000
+        })
+        await Title.create({
+          tconst: `tt${crypto.randomBytes(4).toString('hex')}`,
+          genres: ['Drama'],
+          is_adult: false,
+          average_rating: 7.5,
+          num_votes: 50
+        })
+        return popular
+      }
+
+      test('favours the widely-rated title over the obscure one', async () => {
+        const popular = await seedPair()
+
+        // weight ratio is sqrt(1000000)/sqrt(50) ~= 141:1, so the popular title should
+        // dominate. A loose bound keeps this from flaking on the randomness.
+        expect(await drawShare(popular.tconst, 30)).toBeGreaterThan(0.8)
+      })
+
+      test('still reaches the less popular title at the base exponent', async () => {
+        await Title.destroy({ where: {} })
+        const popular = await Title.create({
+          tconst: `tt${crypto.randomBytes(4).toString('hex')}`,
+          genres: ['Drama'],
+          is_adult: false,
+          average_rating: 7.5,
+          num_votes: 200_000
+        })
+        await Title.create({
+          tconst: `tt${crypto.randomBytes(4).toString('hex')}`,
+          genres: ['Drama'],
+          is_adult: false,
+          average_rating: 7.5,
+          num_votes: 20_000
+        })
+
+        // A 10x vote gap becomes a ~3.2:1 weight ratio at alpha 0.5, so the quieter title
+        // should still surface roughly a quarter of the time.
+        expect(await drawShare(popular.tconst, 40)).toBeLessThan(0.98)
+      })
+
+      // The exponent ramp is deterministic, so assert it directly rather than inferring it
+      // from a sampling distribution.
+      describe('popularity exponent', () => {
+        const alphaFor = (exitFeedback: string | null, skips: number) => {
+          const service = new ProposalCreatorService('irrelevant-uuid')
+          const proposals = Array.from({ length: skips }, () => ({
+            accepted: false,
+            already_seen: false
+          }))
+          return service['popularityAlpha']({ exit_feedback: exitFeedback, proposals })
+        }
+
+        test('stays at the base value without dont_know_movies feedback', () => {
+          expect(alphaFor(null, 6)).toEqual(0.5)
+          expect(alphaFor('just_browsing', 6)).toEqual(0.5)
+        })
+
+        test('jumps to the boosted value when the feedback arrives', () => {
+          expect(alphaFor('dont_know_movies', 4)).toEqual(0.75)
+        })
+
+        test('ramps further on each subsequent skip, up to the cap', () => {
+          expect(alphaFor('dont_know_movies', 5)).toBeCloseTo(0.8)
+          expect(alphaFor('dont_know_movies', 6)).toBeCloseTo(0.85)
+          expect(alphaFor('dont_know_movies', 20)).toEqual(0.9)
+        })
+
+        test('ignores already-seen proposals when counting skips', () => {
+          const service = new ProposalCreatorService('irrelevant-uuid')
+          const alpha = service['popularityAlpha']({
+            exit_feedback: 'dont_know_movies',
+            proposals: [
+              ...Array.from({ length: 4 }, () => ({ accepted: false, already_seen: false })),
+              ...Array.from({ length: 5 }, () => ({ accepted: false, already_seen: true }))
+            ]
+          })
+
+          expect(alpha).toEqual(0.75)
+        })
+      })
+
+      test('leans harder on popularity after dont_know_movies feedback', async () => {
+        const popular = await seedPair()
+
+        expect(await drawShare(popular.tconst, 40, 'dont_know_movies')).toBeGreaterThan(0.9)
+      })
+
+      test('prefers the better rated title when popularity is equal', async () => {
+        await Title.destroy({ where: {} })
+        const acclaimed = await Title.create({
+          tconst: `tt${crypto.randomBytes(4).toString('hex')}`,
+          genres: ['Drama'],
+          is_adult: false,
+          average_rating: 9.0,
+          num_votes: 100_000
+        })
+        await Title.create({
+          tconst: `tt${crypto.randomBytes(4).toString('hex')}`,
+          genres: ['Drama'],
+          is_adult: false,
+          average_rating: 7.1,
+          num_votes: 100_000
+        })
+
+        // weight ratio is (9.0 - 6.5) / (7.1 - 6.5) ~= 4:1
+        expect(await drawShare(acclaimed.tconst, 40)).toBeGreaterThan(0.5)
+      })
+
+      test('picks a title with null rating and votes rather than skipping it', async () => {
+        await Title.destroy({ where: {} })
+        const bare = await Title.create({
+          tconst: `tt${crypto.randomBytes(4).toString('hex')}`,
+          genres: ['Drama'],
+          is_adult: false
+        })
+        const session = await SearchSession.create({ public: 'alone', genres: ['Drama'] })
+
+        const res = await new ProposalCreatorService(session.uuid).perform()
+
+        expect(res.success).toBe(true)
+        if (!res.success) throw new Error('Expected success')
+        expect(res.body.tconst).toEqual(bare.tconst)
+      })
+    })
+
     describe('when title already has a video in the database', () => {
       beforeEach(async () => {
         const Video = db.videos
