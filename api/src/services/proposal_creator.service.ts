@@ -8,6 +8,21 @@ const FEEDBACK_GENRE_EXCLUSIONS: Record<string, string[]> = {
   too_scary: ['Horror', 'Thriller'],
 }
 
+// Titles are ranked by weighted random sampling, with the weight driven by num_votes.
+// The exponent controls how strongly popularity biases the pick: at 0.5 roughly half the
+// proposals are titles with 25k+ votes, at 0.75 around 80% are.
+const BASE_ALPHA = 0.5
+const BOOSTED_ALPHA = 0.75
+const MAX_ALPHA = 0.9
+
+// Mirrors EXIT_PROMPT_SKIP_THRESHOLD in front/src/views/ProposalView.vue: the number of
+// skips after which the user is asked why they are not finding a pick.
+const SKIP_PROMPT_THRESHOLD = 4
+
+// Ratings are already filtered to > 7 at seed time, so anchoring below that floor keeps the
+// multiplier a nudge (~6x spread) rather than a second filter.
+const RATING_ANCHOR = 6.5
+
 const Proposal = db.proposals
 const SearchSession = db.search_sessions
 const Title = db.titles
@@ -79,12 +94,19 @@ class ProposalCreatorService {
     } else {
       const where = this.titleFilters(searchSession)
       const likedDirs = this.likedDirectors(searchSession)
+      const alpha = this.popularityAlpha(searchSession)
 
-      let orderSql = 'random() * (average_rating + LOG(GREATEST(num_votes, 1)))'
+      let weightSql = `POWER(GREATEST(COALESCE(num_votes, 1), 1), ${alpha})`
+        + ` * GREATEST(COALESCE(average_rating, 7) - ${RATING_ANCHOR}, 0.1)`
       if (likedDirs.length > 0) {
         const escapedDirs = likedDirs.map(d => db.sequelize.escape(d)).join(',')
-        orderSql += ` * CASE WHEN "title"."directors" && ARRAY[${escapedDirs}]::varchar[] THEN 1.5 ELSE 1 END`
+        weightSql += ` * CASE WHEN "title"."directors" && ARRAY[${escapedDirs}]::varchar[] THEN 1.5 ELSE 1 END`
       }
+
+      // Efraimidis-Spirakis weighted sampling: taking the smallest -LN(u) / weight draws a
+      // title with probability proportional to its weight. `1 - random()` keeps u in (0, 1]
+      // so LN is never handed a zero, which Postgres rejects.
+      const orderSql = `-LN(1 - random()) / (${weightSql}) ASC`
 
       return await Title.findOne({ where, order: literal(orderSql), include: [Video] })
     }
@@ -99,6 +121,22 @@ class ProposalCreatorService {
       }
     }
     return Array.from(directors)
+  }
+
+  // Strength of the popularity bias. Raised when the user has told us mid-session that they
+  // do not know the movies being proposed, then ramped further on each subsequent skip.
+  private popularityAlpha(searchSession: unknown): number {
+    const ss = searchSession as {
+      exit_feedback: string | null
+      proposals: Array<{ accepted: boolean | null; already_seen: boolean | null }>
+    }
+
+    if (ss.exit_feedback !== 'dont_know_movies') return BASE_ALPHA
+
+    const skips = ss.proposals.filter(p => p.accepted === false && p.already_seen !== true).length
+    const extraSkips = Math.max(0, skips - SKIP_PROMPT_THRESHOLD)
+
+    return Math.min(BOOSTED_ALPHA + 0.05 * extraSkips, MAX_ALPHA)
   }
 
   private maximalStartYear(searchSession: unknown): number | null {
