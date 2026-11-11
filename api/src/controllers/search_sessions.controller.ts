@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { isValidUUID } from '../utils/helper.util'
+import { isValidUUID, parseAcceptLanguage } from '../utils/helper.util'
 import db from '../models'
 
 const SearchSession = db.search_sessions
@@ -8,7 +8,8 @@ const Proposal = db.proposals
 export const create = (req: Request, res: Response): void => {
   const searchSessionParams = {
     public: req.body.public,
-    genres: req.body.genres
+    genres: req.body.genres,
+    languages: parseAcceptLanguage(req.get('Accept-Language'))
   }
 
   SearchSession.create(searchSessionParams)

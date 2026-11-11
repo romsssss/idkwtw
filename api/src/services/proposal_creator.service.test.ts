@@ -464,6 +464,65 @@ describe('#perform', () => {
         expect(share).toBeLessThan(0.85)
       })
 
+      describe('original language', () => {
+        async function seedLanguagePair() {
+          await Title.destroy({ where: {} })
+          const english = await Title.create({
+            tconst: `tt${crypto.randomBytes(4).toString('hex')}`,
+            genres: ['Drama'],
+            is_adult: false,
+            average_rating: 7.5,
+            num_votes: 100_000,
+            original_language: 'en'
+          })
+          const korean = await Title.create({
+            tconst: `tt${crypto.randomBytes(4).toString('hex')}`,
+            genres: ['Drama'],
+            is_adult: false,
+            average_rating: 7.5,
+            num_votes: 100_000,
+            original_language: 'ko'
+          })
+          return { english, korean }
+        }
+
+        async function koreanShare(languages: string[] | null, korean: string, draws: number) {
+          let picks = 0
+          for (let i = 0; i < draws; i++) {
+            const session = await SearchSession.create({ public: 'alone', genres: ['Drama'], languages })
+            const res = await new ProposalCreatorService(session.uuid).perform()
+
+            if (!res.success) throw new Error('Expected success')
+            if (res.body.tconst === korean) picks += 1
+          }
+          return picks / draws
+        }
+
+        test('favours titles in English when the session has no languages', async () => {
+          const { korean } = await seedLanguagePair()
+
+          // 10:1 weight ratio, so the Korean title should come back roughly 1 time in 11
+          expect(await koreanShare(null, korean.tconst, 40)).toBeLessThan(0.25)
+        })
+
+        test('does not penalise titles in one of the session languages', async () => {
+          const { korean } = await seedLanguagePair()
+
+          const share = await koreanShare(['ko', 'en'], korean.tconst, 40)
+          expect(share).toBeGreaterThan(0.15)
+          expect(share).toBeLessThan(0.85)
+        })
+
+        test('does not penalise titles with an unknown language', async () => {
+          const { korean } = await seedLanguagePair()
+          await korean.update({ original_language: null })
+
+          const share = await koreanShare(null, korean.tconst, 40)
+          expect(share).toBeGreaterThan(0.15)
+          expect(share).toBeLessThan(0.85)
+        })
+      })
+
       test('picks a title with null rating and votes rather than skipping it', async () => {
         await Title.destroy({ where: {} })
         const bare = await Title.create({

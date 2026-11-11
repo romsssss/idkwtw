@@ -39,7 +39,8 @@ ON CONFLICT (tconst) DO UPDATE SET
   average_rating = EXCLUDED.average_rating,
   num_votes = EXCLUDED.num_votes,
   directors = EXCLUDED.directors,
-  writers = EXCLUDED.writers;
+  writers = EXCLUDED.writers,
+  original_language = COALESCE(EXCLUDED.original_language, public.titles.original_language);
 
 DROP TABLE titles_import;
 SQL

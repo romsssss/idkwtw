@@ -63,7 +63,16 @@ The following command will cleanup `imdb_datasets` schema from any inconsistent 
 psql $POSTGRES_CONNECTION_URI < database/cleanup.sql
 ```
 
-### STEP 5: transfer titles to production
+### STEP 5: backfill original languages
+
+`public.titles` has no language information in the IMDB datasets, so the original language of each title is looked up on TMDB (requires `API_KEY_THE_MOVIE_DB` in `.env`). Only titles without a language are looked up, most popular first, so the script can be re-run after importing new titles or interrupted at any point. An optional argument limits the number of titles looked up.
+
+```bash
+python backfill_original_language.py         # all titles missing a language (~35 min for the full catalogue)
+python backfill_original_language.py 5000    # only the 5,000 most popular
+```
+
+### STEP 6: transfer titles to production
 
 Run the following command to populate the `public.titles` table in the production (Vercel/Neon) database.
 Existing rows are silently skipped; `proposals` and `videos` are never touched.
