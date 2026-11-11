@@ -10,10 +10,19 @@ const FEEDBACK_GENRE_EXCLUSIONS: Record<string, string[]> = {
 
 // Titles are ranked by weighted random sampling, with the weight driven by num_votes.
 // The exponent controls how strongly popularity biases the pick: at 0.5 roughly half the
-// proposals are titles with 25k+ votes, at 0.75 around 80% are.
-const BASE_ALPHA = 0.5
-const BOOSTED_ALPHA = 0.75
-const MAX_ALPHA = 0.9
+// proposals are titles with 25k+ votes, at 0.7 around 75% are, at 0.85 close to 90%.
+// The base was raised from 0.5 after exit feedback showed ~30% of drop-offs were
+// "I don't know these movies".
+const BASE_ALPHA = 0.7
+const BOOSTED_ALPHA = 0.85
+const MAX_ALPHA = 0.95
+
+// Titles released before the pivot year have their weight halved every half-life years.
+// A soft decay rather than a filter, so well-loved classics still surface: it brings
+// pre-1980 titles from ~16% of proposals to ~4%, and pre-2000 from ~39% to ~24%.
+// An explicit too_old rejection still applies a hard start_year filter on top.
+const RECENCY_PIVOT_YEAR = 2000
+const RECENCY_HALF_LIFE_YEARS = 15
 
 // Mirrors EXIT_PROMPT_SKIP_THRESHOLD in front/src/views/ProposalView.vue: the number of
 // skips after which the user is asked why they are not finding a pick.
@@ -98,6 +107,7 @@ class ProposalCreatorService {
 
       let weightSql = `POWER(GREATEST(COALESCE(num_votes, 1), 1), ${alpha})`
         + ` * GREATEST(COALESCE(average_rating, 7) - ${RATING_ANCHOR}, 0.1)`
+        + ` * POWER(0.5, GREATEST(${RECENCY_PIVOT_YEAR} - COALESCE(start_year, ${RECENCY_PIVOT_YEAR}), 0) / ${RECENCY_HALF_LIFE_YEARS}.0)`
       if (likedDirs.length > 0) {
         const escapedDirs = likedDirs.map(d => db.sequelize.escape(d)).join(',')
         weightSql += ` * CASE WHEN "title"."directors" && ARRAY[${escapedDirs}]::varchar[] THEN 1.5 ELSE 1 END`
