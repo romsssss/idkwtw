@@ -343,8 +343,8 @@ describe('#perform', () => {
           num_votes: 20_000
         })
 
-        // A 10x vote gap becomes a ~3.2:1 weight ratio at alpha 0.5, so the quieter title
-        // should still surface roughly a quarter of the time.
+        // A 10x vote gap becomes a ~5:1 weight ratio at alpha 0.7, so the quieter title
+        // should still surface roughly a sixth of the time.
         expect(await drawShare(popular.tconst, 40)).toBeLessThan(0.98)
       })
 
@@ -361,18 +361,18 @@ describe('#perform', () => {
         }
 
         test('stays at the base value without dont_know_movies feedback', () => {
-          expect(alphaFor(null, 6)).toEqual(0.5)
-          expect(alphaFor('just_browsing', 6)).toEqual(0.5)
+          expect(alphaFor(null, 6)).toEqual(0.7)
+          expect(alphaFor('just_browsing', 6)).toEqual(0.7)
         })
 
         test('jumps to the boosted value when the feedback arrives', () => {
-          expect(alphaFor('dont_know_movies', 4)).toEqual(0.75)
+          expect(alphaFor('dont_know_movies', 4)).toEqual(0.85)
         })
 
         test('ramps further on each subsequent skip, up to the cap', () => {
-          expect(alphaFor('dont_know_movies', 5)).toBeCloseTo(0.8)
-          expect(alphaFor('dont_know_movies', 6)).toBeCloseTo(0.85)
-          expect(alphaFor('dont_know_movies', 20)).toEqual(0.9)
+          expect(alphaFor('dont_know_movies', 5)).toBeCloseTo(0.9)
+          expect(alphaFor('dont_know_movies', 6)).toBeCloseTo(0.95)
+          expect(alphaFor('dont_know_movies', 20)).toEqual(0.95)
         })
 
         test('ignores already-seen proposals when counting skips', () => {
@@ -385,7 +385,7 @@ describe('#perform', () => {
             ]
           })
 
-          expect(alpha).toEqual(0.75)
+          expect(alpha).toEqual(0.85)
         })
       })
 
@@ -414,6 +414,54 @@ describe('#perform', () => {
 
         // weight ratio is (9.0 - 6.5) / (7.1 - 6.5) ~= 4:1
         expect(await drawShare(acclaimed.tconst, 40)).toBeGreaterThan(0.5)
+      })
+
+      test('favours recent titles over equally rated older ones', async () => {
+        await Title.destroy({ where: {} })
+        const recent = await Title.create({
+          tconst: `tt${crypto.randomBytes(4).toString('hex')}`,
+          genres: ['Drama'],
+          is_adult: false,
+          average_rating: 7.5,
+          num_votes: 100_000,
+          start_year: 2015
+        })
+        await Title.create({
+          tconst: `tt${crypto.randomBytes(4).toString('hex')}`,
+          genres: ['Drama'],
+          is_adult: false,
+          average_rating: 7.5,
+          num_votes: 100_000,
+          start_year: 1950
+        })
+
+        // 50 years before the pivot at a 15-year half-life is a ~10:1 weight ratio
+        expect(await drawShare(recent.tconst, 40)).toBeGreaterThan(0.75)
+      })
+
+      test('does not penalise titles released after the pivot year', async () => {
+        await Title.destroy({ where: {} })
+        const newest = await Title.create({
+          tconst: `tt${crypto.randomBytes(4).toString('hex')}`,
+          genres: ['Drama'],
+          is_adult: false,
+          average_rating: 7.5,
+          num_votes: 100_000,
+          start_year: 2024
+        })
+        await Title.create({
+          tconst: `tt${crypto.randomBytes(4).toString('hex')}`,
+          genres: ['Drama'],
+          is_adult: false,
+          average_rating: 7.5,
+          num_votes: 100_000,
+          start_year: 2001
+        })
+
+        // Equal weights, so neither title should dominate
+        const share = await drawShare(newest.tconst, 40)
+        expect(share).toBeGreaterThan(0.15)
+        expect(share).toBeLessThan(0.85)
       })
 
       test('picks a title with null rating and votes rather than skipping it', async () => {
