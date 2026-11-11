@@ -7,9 +7,10 @@ export interface SearchSessionAttributes {
   tconst_chosen: string | null
   exit_feedback: 'just_browsing' | 'nothing_fits_mood' | 'dont_know_movies' | 'other' | null
   exit_feedback_note: string | null
+  languages: string[] | null
 }
 
-export type SearchSessionCreationAttributes = Optional<SearchSessionAttributes, 'uuid' | 'exit_feedback' | 'exit_feedback_note'>
+export type SearchSessionCreationAttributes = Optional<SearchSessionAttributes, 'uuid' | 'exit_feedback' | 'exit_feedback_note' | 'languages'>
 
 class SearchSession extends Model<SearchSessionAttributes, SearchSessionCreationAttributes> implements SearchSessionAttributes {
   declare uuid: string
@@ -18,6 +19,7 @@ class SearchSession extends Model<SearchSessionAttributes, SearchSessionCreation
   declare tconst_chosen: string | null
   declare exit_feedback: 'just_browsing' | 'nothing_fits_mood' | 'dont_know_movies' | 'other' | null
   declare exit_feedback_note: string | null
+  declare languages: string[] | null
 
   declare readonly created_at: Date
   declare readonly updated_at: Date
@@ -45,6 +47,9 @@ class SearchSession extends Model<SearchSessionAttributes, SearchSessionCreation
       },
       exit_feedback_note: {
         type: DataTypes.STRING
+      },
+      languages: {
+        type: DataTypes.ARRAY(DataTypes.STRING)
       }
     }, {
       sequelize,

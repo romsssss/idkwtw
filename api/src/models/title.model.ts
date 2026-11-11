@@ -14,6 +14,7 @@ export interface TitleAttributes {
   num_votes: number | null
   directors: string[] | null
   writers: string[] | null
+  original_language: string | null
 }
 
 class Title extends Model<TitleAttributes> implements TitleAttributes {
@@ -30,6 +31,7 @@ class Title extends Model<TitleAttributes> implements TitleAttributes {
   declare num_votes: number | null
   declare directors: string[] | null
   declare writers: string[] | null
+  declare original_language: string | null
 
   static initModel(sequelize: Sequelize): typeof Title {
     Title.init({
@@ -72,6 +74,9 @@ class Title extends Model<TitleAttributes> implements TitleAttributes {
       },
       writers: {
         type: DataTypes.ARRAY(DataTypes.STRING)
+      },
+      original_language: {
+        type: DataTypes.STRING
       }
     }, {
       sequelize,

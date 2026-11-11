@@ -24,6 +24,12 @@ const MAX_ALPHA = 0.95
 const RECENCY_PIVOT_YEAR = 2000
 const RECENCY_HALF_LIFE_YEARS = 15
 
+// Titles whose original language is not one of the viewer's (from Accept-Language, always
+// including English) are made 10x less likely rather than excluded, so foreign-language
+// films still surface occasionally. Titles with an unknown language are not penalised.
+const OTHER_LANGUAGE_WEIGHT = 0.1
+const DEFAULT_LANGUAGES = ['en']
+
 // Mirrors EXIT_PROMPT_SKIP_THRESHOLD in front/src/views/ProposalView.vue: the number of
 // skips after which the user is asked why they are not finding a pick.
 const SKIP_PROMPT_THRESHOLD = 4
@@ -104,10 +110,13 @@ class ProposalCreatorService {
       const where = this.titleFilters(searchSession)
       const likedDirs = this.likedDirectors(searchSession)
       const alpha = this.popularityAlpha(searchSession)
+      const languages = searchSession.languages?.length ? searchSession.languages : DEFAULT_LANGUAGES
+      const escapedLanguages = languages.map(l => db.sequelize.escape(l)).join(',')
 
       let weightSql = `POWER(GREATEST(COALESCE(num_votes, 1), 1), ${alpha})`
         + ` * GREATEST(COALESCE(average_rating, 7) - ${RATING_ANCHOR}, 0.1)`
         + ` * POWER(0.5, GREATEST(${RECENCY_PIVOT_YEAR} - COALESCE(start_year, ${RECENCY_PIVOT_YEAR}), 0) / ${RECENCY_HALF_LIFE_YEARS}.0)`
+        + ` * CASE WHEN "title"."original_language" IS NULL OR "title"."original_language" IN (${escapedLanguages}) THEN 1 ELSE ${OTHER_LANGUAGE_WEIGHT} END`
       if (likedDirs.length > 0) {
         const escapedDirs = likedDirs.map(d => db.sequelize.escape(d)).join(',')
         weightSql += ` * CASE WHEN "title"."directors" && ARRAY[${escapedDirs}]::varchar[] THEN 1.5 ELSE 1 END`

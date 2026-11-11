@@ -21,6 +21,16 @@ describe('#create', () => {
           expect(response.body).toHaveProperty('uuid')
         })
     })
+
+    test('stores the viewer languages from the Accept-Language header', () => {
+      return request(app)
+        .post('/search_sessions')
+        .set('Accept-Language', 'nl-NL,nl;q=0.9,en;q=0.8')
+        .send({})
+        .then(response => {
+          expect(response.body.languages).toEqual(['nl', 'en'])
+        })
+    })
   })
 
   describe('when creation fails', () => {

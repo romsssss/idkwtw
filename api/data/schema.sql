@@ -12,7 +12,8 @@ CREATE TABLE IF NOT EXISTS public.titles (
   average_rating FLOAT,
   num_votes INTEGER,
   directors VARCHAR(10)[],
-  writers VARCHAR(10)[]
+  writers VARCHAR(10)[],
+  original_language VARCHAR(2)
 );
 
 DROP TYPE IF EXISTS public.enum_search_sessions_public CASCADE;
@@ -26,6 +27,7 @@ CREATE TABLE IF NOT EXISTS public.search_sessions (
     tconst_chosen varchar,
     exit_feedback public.enum_search_sessions_exit_feedback,
     exit_feedback_note varchar,
+    languages VARCHAR(255)[],
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL,
      PRIMARY KEY (uuid)
