@@ -14,32 +14,32 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
-    "@unhead/vue": "^2.1.17",
+    "@unhead/vue": "^2.1.18",
     "node-fetch": "^3.3.1",
     "pinia": "^4.1.0",
     "vite-ssg": "^28.3.0",
-    "vue": "^3.5.45",
-    "vue-i18n": "^11.4.19",
-    "vue-router": "^5.5.0"
+    "vue": "^3.5.46",
+    "vue-i18n": "^11.4.23",
+    "vue-router": "^5.5.1"
   },
   "devDependencies": {
-    "@playwright/test": "^1.65.0",
+    "@playwright/test": "^1.65.1",
     "@tsconfig/node20": "^20.1.11",
     "@types/jsdom": "^30.0.0",
     "@types/node": "^26.6.6",
     "@vitejs/plugin-vue": "^6.0.11",
     "@vue/eslint-config-prettier": "^10.0.0",
     "@vue/eslint-config-typescript": "^14.9.0",
-    "@vue/test-utils": "^2.5.1",
+    "@vue/test-utils": "^2.6.0",
     "@vue/tsconfig": "^0.9.1",
-    "eslint": "^10.14.0",
+    "eslint": "^10.15.0",
     "eslint-plugin-vue": "^10.12.1",
     "jsdom": "^30.1.3",
     "npm-run-all": "^4.1.5",
     "prettier": "^3.10.1",
     "typescript": "~6.0.3",
     "vite": "^8.3.8",
-    "vitest": "^5.1.0",
+    "vitest": "^5.1.1",
     "vue-tsc": "^3.3.14"
   }
 }
